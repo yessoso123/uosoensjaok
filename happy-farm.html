@@ -1,0 +1,2817 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌱 開心農場</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Fredoka+One&display=swap');
+
+:root {
+  --green: #4CAF50;
+  --green-dark: #388E3C;
+  --green-light: #A5D6A7;
+  --yellow: #FFD600;
+  --orange: #FF8F00;
+  --brown: #795548;
+  --brown-light: #A1887F;
+  --sky: #87CEEB;
+  --dirt: #8B6914;
+  --red: #E53935;
+  --blue: #1976D2;
+  --purple: #7B1FA2;
+  --pink: #E91E63;
+  --bg: #E8F5E9;
+  --card: #fff;
+  --shadow: 0 4px 16px rgba(0,0,0,0.12);
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: linear-gradient(135deg, #b2dfdb 0%, #c8e6c9 50%, #dcedc8 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+h1, h2, h3, .logo-text {
+  font-family: 'Fredoka One', 'Noto Sans TC', cursive;
+}
+
+/* ===== AUTH SCREEN ===== */
+#auth-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #43a047 0%, #66bb6a 40%, #a5d6a7 100%);
+}
+
+.auth-box {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 36px;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  text-align: center;
+}
+
+.auth-logo { font-size: 56px; margin-bottom: 4px; }
+.auth-box h1 { color: var(--green-dark); font-size: 2rem; margin-bottom: 6px; }
+.auth-box p.sub { color: #888; font-size: 0.85rem; margin-bottom: 24px; }
+
+.tab-row {
+  display: flex; border-radius: 12px; overflow: hidden;
+  margin-bottom: 24px; border: 2px solid var(--green-light);
+}
+.tab-btn {
+  flex: 1; padding: 10px; border: none; background: transparent;
+  cursor: pointer; font-size: 0.95rem; font-family: inherit;
+  color: #666; transition: all .2s;
+}
+.tab-btn.active { background: var(--green); color: #fff; font-weight: 700; }
+
+.form-group { margin-bottom: 14px; text-align: left; }
+.form-group label { font-size: 0.82rem; color: #666; margin-bottom: 4px; display: block; }
+.form-group input {
+  width: 100%; padding: 10px 14px;
+  border: 2px solid #e0e0e0; border-radius: 10px;
+  font-size: 0.95rem; font-family: inherit; outline: none;
+  transition: border .2s;
+}
+.form-group input:focus { border-color: var(--green); }
+
+.btn {
+  padding: 11px 22px; border: none; border-radius: 12px;
+  cursor: pointer; font-family: inherit; font-weight: 700;
+  font-size: 0.95rem; transition: all .2s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--green); color: #fff; width: 100%; justify-content: center; padding: 13px; font-size: 1rem; }
+.btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { background: #e65100; transform: translateY(-1px); }
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: #b71c1c; }
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-blue:hover { background: #0d47a1; }
+.btn-yellow { background: var(--yellow); color: #333; }
+.btn-yellow:hover { background: #ffc400; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-purple:hover { background: #4a148c; }
+.btn-brown { background: var(--brown); color: #fff; }
+.btn-brown:hover { background: #4e342e; }
+.btn-sm { padding: 6px 14px; font-size: 0.82rem; border-radius: 8px; }
+.btn-xs { padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.error-msg {
+  color: var(--red); font-size: 0.82rem;
+  margin-top: 8px; min-height: 18px;
+}
+
+/* ===== MAIN GAME ===== */
+#game-screen { display: none; min-height: 100vh; padding-bottom: 24px; }
+
+/* TOP BAR */
+.topbar {
+  background: linear-gradient(90deg, #2e7d32 0%, #43a047 100%);
+  color: #fff; padding: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap; position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.topbar-logo {
+  font-size: 1.2rem;
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: 1px;
+  display: flex; align-items: center; gap: 4px;
+}
+.stat-pill {
+  background: rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  display: inline-flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+}
+.audio-btn {
+  background: rgba(255,255,255,0.18);
+  border: none; color: #fff;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .2s;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.audio-btn:hover { background: rgba(255,255,255,0.3); }
+.audio-btn.off { opacity: 0.55; }
+
+.topbar-spacer { flex: 1 1 auto; min-width: 4px; }
+
+/* NAV TABS */
+.nav-tabs {
+  background: #fff;
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 3px solid var(--green-light);
+  position: sticky;
+  top: 52px;
+  z-index: 99;
+  scrollbar-width: thin;
+}
+.nav-tabs::-webkit-scrollbar { height: 4px; }
+.nav-tabs::-webkit-scrollbar-thumb { background: var(--green-light); border-radius: 4px; }
+
+.nav-tab {
+  flex: none; padding: 10px 16px;
+  border: none; background: transparent;
+  cursor: pointer; font-family: inherit;
+  font-size: 0.88rem; font-weight: 700; color: #888;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px; transition: all .2s;
+  display: flex; align-items: center; gap: 4px;
+  white-space: nowrap;
+}
+.nav-tab.active { color: var(--green-dark); border-bottom-color: var(--green-dark); }
+.nav-tab:hover { color: var(--green); }
+
+/* SECTIONS */
+.section { display: none; padding: 16px; max-width: 1000px; margin: 0 auto; }
+.section.active { display: block; }
+
+.section-title {
+  font-size: 1.3rem; font-weight: 900;
+  color: var(--green-dark); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* CARDS */
+.card {
+  background: #fff; border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px;
+}
+.card-title {
+  font-size: 1rem; font-weight: 700;
+  color: var(--green-dark); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+  border-left: 4px solid var(--green); padding-left: 8px;
+}
+
+/* FARM */
+.farm-header {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 14px;
+  flex-wrap: wrap; gap: 8px;
+}
+.farm-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  max-width: 700px;
+  margin: 0 auto 20px;
+}
+.cell {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 3px solid #8B6914;
+  cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  position: relative;
+  transition: transform .15s, box-shadow .15s;
+  background: #c8a96e;
+  overflow: hidden;
+  min-height: 80px;
+}
+.cell:hover { transform: scale(1.04); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.cell.locked { background: #9e9e9e; border-color: #757575; cursor: not-allowed; opacity: 0.7; }
+.cell.empty { background: #c8a96e; }
+.cell.planted { background: #795548; border-color: #5d4037; }
+.cell.growing { background: #6d4c41; border-color: #4e342e; }
+.cell.ready { background: #33691E; border-color: #1b5e20; animation: pulse-green 1.5s infinite; }
+.cell.withered { background: #757575; border-color: #616161; filter: grayscale(0.7); }
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(76,175,80,0); }
+}
+.cell-label {
+  font-size: 0.55rem; color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  text-align: center; line-height: 1.2;
+  max-width: 90%;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+.progress-bar-mini {
+  position: absolute; bottom: 0; left: 0; height: 4px;
+  background: #8BC34A; transition: width .3s;
+}
+.lock-icon { font-size: 1.2rem; margin-bottom: 2px; }
+.lock-price {
+  font-size: 0.55rem; color: #fff;
+  background: rgba(0,0,0,0.5);
+  border-radius: 6px; padding: 1px 5px;
+}
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: #fff; border-radius: 20px; padding: 22px;
+  max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.modal h2 { margin-bottom: 14px; color: var(--green-dark); font-size: 1.3rem; }
+
+.crop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.crop-card {
+  border: 2px solid #e0e0e0; border-radius: 12px;
+  padding: 10px 6px; text-align: center;
+  cursor: pointer; transition: all .2s;
+}
+.crop-card:hover { border-color: var(--green); background: #f1f8e9; }
+.crop-card.selected { border-color: var(--green); background: #e8f5e9; }
+.crop-card .emoji { font-size: 1.8rem; }
+.crop-card .name { font-size: 0.78rem; font-weight: 700; color: #333; margin-top: 2px; }
+.crop-card .info { font-size: 0.68rem; color: #888; margin-top: 1px; }
+
+/* SHOP */
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.shop-item {
+  border: 2px solid #e0e0e0; border-radius: 14px;
+  padding: 14px 10px; text-align: center;
+  background: #fafafa; transition: all .2s;
+}
+.shop-item:hover { border-color: var(--orange); background: #fff8e1; }
+.shop-item .emoji { font-size: 2.2rem; }
+.shop-item .item-name { font-size: 0.82rem; font-weight: 700; margin: 6px 0 2px; }
+.shop-item .item-desc { font-size: 0.7rem; color: #888; margin-bottom: 8px; min-height: 28px; }
+.shop-item .item-price { font-size: 0.88rem; font-weight: 700; color: var(--orange); margin-bottom: 8px; }
+
+/* TASKS */
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+.task-item {
+  border: 2px solid #e0e0e0; border-radius: 12px;
+  padding: 12px 14px; display: flex;
+  align-items: center; gap: 12px;
+  background: #fafafa; transition: all .2s;
+}
+.task-item.done { border-color: var(--green); background: #f1f8e9; opacity: 0.75; }
+.task-item.festival { border-color: var(--red); background: #fff3e0; }
+.task-emoji { font-size: 1.6rem; flex: none; }
+.task-info { flex: 1; min-width: 0; }
+.task-name { font-size: 0.92rem; font-weight: 700; }
+.task-desc { font-size: 0.75rem; color: #888; margin-top: 2px; }
+.task-progress { font-size: 0.78rem; color: var(--blue); font-weight: 700; margin-top: 3px; }
+.task-reward { font-size: 0.78rem; font-weight: 700; color: var(--orange); white-space: nowrap; text-align: right; }
+
+/* NEIGHBOR */
+.neighbor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.neighbor-card {
+  border: 2px solid #e0e0e0; border-radius: 14px;
+  padding: 12px 8px; text-align: center;
+  background: #fafafa; transition: all .2s; cursor: pointer;
+}
+.neighbor-card:hover { border-color: var(--blue); background: #e3f2fd; }
+.neighbor-card.friend { border-color: var(--orange); background: #fff8e1; }
+.neighbor-avatar { font-size: 2.2rem; }
+.neighbor-name { font-size: 0.82rem; font-weight: 700; margin: 4px 0 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.neighbor-level { font-size: 0.7rem; color: #888; }
+
+/* ANIMAL */
+.animal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.animal-card {
+  border: 2px solid #e0e0e0; border-radius: 14px;
+  padding: 14px 10px; text-align: center;
+  background: #fafafa; transition: all .2s;
+}
+.animal-card.owned { border-color: var(--green); background: #f1f8e9; }
+.animal-emoji { font-size: 2rem; }
+.animal-name { font-size: 0.82rem; font-weight: 700; margin: 6px 0 2px; }
+.animal-info { font-size: 0.7rem; color: #888; margin-bottom: 8px; }
+.animal-status { font-size: 0.72rem; color: var(--green-dark); font-weight: 700; }
+
+.animal-rate-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 8px; margin-top: 8px;
+}
+.animal-rate {
+  background: #f1f8e9; border-radius: 10px;
+  padding: 8px 10px; font-size: 0.86rem;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* XP BAR */
+.xp-bar-wrap {
+  background: #e0e0e0; border-radius: 10px;
+  height: 8px; overflow: hidden; margin-top: 2px;
+}
+.xp-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #66bb6a, #aed581);
+  border-radius: 10px; transition: width .4s;
+}
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #212121; color: #fff;
+  padding: 12px 22px; border-radius: 24px;
+  font-size: 0.9rem; z-index: 999;
+  transition: transform .3s;
+  pointer-events: none; max-width: 92vw;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* CHECKIN */
+.checkin-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 14px;
+}
+.checkin-day {
+  text-align: center; border: 2px solid #e0e0e0;
+  border-radius: 12px; padding: 10px 4px;
+  font-size: 0.8rem;
+}
+.checkin-day.done { background: var(--green); border-color: var(--green-dark); color: #fff; }
+.checkin-day .gift { font-size: 1.6rem; margin: 4px 0; }
+.checkin-day .reward { font-size: 0.7rem; color: #888; }
+.checkin-day.done .reward { color: rgba(255,255,255,0.95); }
+.checkin-day.today { border-color: var(--orange); background: #fff8e1; }
+
+/* PROFILE */
+.profile-info { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.profile-avatar {
+  font-size: 4rem; background: #fff8e1;
+  border-radius: 50%; width: 84px; height: 84px;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid var(--orange);
+}
+.profile-details { flex: 1; min-width: 160px; }
+.profile-name { font-size: 1.4rem; font-weight: 900; color: var(--green-dark); }
+.profile-level { color: var(--orange); font-weight: 700; margin: 4px 0; display: flex; align-items: center; gap: 4px; }
+.profile-xp-text { font-size: 0.82rem; color: #666; margin-top: 4px; }
+
+.info-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.92rem;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .label { display: flex; align-items: center; gap: 6px; }
+
+/* DOG */
+.dog-banner {
+  background: linear-gradient(90deg, #795548, #a1887f);
+  color: #fff; border-radius: 12px;
+  padding: 10px 16px; display: flex;
+  align-items: center; gap: 10px;
+  margin-bottom: 12px; font-size: 0.9rem;
+}
+
+/* FESTIVAL */
+.festival-status-card {
+  background: #fff; border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow);
+  margin-bottom: 14px;
+  border-left: 6px solid #bdbdbd;
+}
+.festival-status-card.active {
+  border-left-color: var(--red);
+  background: linear-gradient(90deg, #fff, #fff3e0);
+}
+.festival-card {
+  background: #fff; border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow);
+  margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.festival-card.active {
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+  border: 2px solid var(--red);
+}
+.festival-card-header {
+  display: flex; gap: 12px;
+  align-items: flex-start; margin-bottom: 12px;
+  padding-left: 8px; border-left: 4px solid var(--green);
+}
+.festival-card-emoji {
+  font-size: 2.5rem; flex: none;
+  background: #fff8e1; border-radius: 14px;
+  width: 64px; height: 64px;
+  display: flex; align-items: center; justify-content: center;
+}
+.festival-card-info { flex: 1; min-width: 0; }
+.festival-card-name { font-size: 1.15rem; font-weight: 900; color: var(--green-dark); }
+.festival-card-desc { font-size: 0.86rem; color: #555; margin-top: 4px; line-height: 1.4; }
+.festival-card-buff {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--orange); margin-top: 6px;
+}
+.festival-tasks { display: flex; flex-direction: column; gap: 8px; }
+.festival-task {
+  border: 2px solid #ffe0b2; border-radius: 10px;
+  padding: 10px 14px;
+  display: flex; align-items: center; gap: 12px;
+  background: #fffaf0;
+}
+.festival-task.done { background: #f1f8e9; border-color: var(--green); opacity: 0.75; }
+.festival-emoji-sm { font-size: 1.4rem; flex: none; }
+
+/* FISHING */
+.fishing-card {
+  background: linear-gradient(180deg, #b3e5fc 0%, #4fc3f7 60%, #0288d1 100%);
+  border-radius: var(--radius);
+  padding: 24px 16px; text-align: center;
+  position: relative; overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  margin-bottom: 14px;
+}
+.fishing-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 200% 60% at 50% 100%, rgba(0,0,0,0.2), transparent 60%),
+    repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 14px);
+  pointer-events: none;
+}
+.fishing-wave {
+  font-size: 5rem;
+  display: block;
+  margin: 8px 0 16px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  position: relative; z-index: 1;
+}
+.fishing-status {
+  color: #fff; font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  font-size: 1rem; margin-bottom: 12px;
+  min-height: 24px; position: relative; z-index: 1;
+}
+.fishing-card .btn { position: relative; z-index: 1; padding: 14px 28px; font-size: 1rem; }
+.fishing-card.fishing .fishing-wave { animation: wave-bob 1.4s ease-in-out infinite; }
+@keyframes wave-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.fishing-card.bite { animation: bite-flash 0.4s ease-in-out infinite alternate; }
+@keyframes bite-flash {
+  from { box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  to { box-shadow: 0 6px 20px rgba(255,193,7,0.7), inset 0 0 60px rgba(255,193,7,0.4); }
+}
+
+.fish-codex { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media(min-width: 600px) {
+  .fish-codex { grid-template-columns: repeat(3, 1fr); }
+}
+.fish-card {
+  border: 2px solid #e0e0e0; border-radius: 14px;
+  padding: 14px 10px; text-align: center;
+  background: #fafafa;
+}
+.fish-card.caught { border-color: var(--blue); background: #e3f2fd; }
+.fish-card .emoji { font-size: 2.2rem; }
+.fish-card .name { font-size: 0.92rem; font-weight: 700; margin-top: 4px; }
+.fish-card .rarity { font-size: 0.72rem; color: #888; margin-top: 2px; }
+.fish-card .info { font-size: 0.78rem; color: var(--orange); font-weight: 700; margin-top: 4px; }
+.fish-card .count { font-size: 0.74rem; color: var(--blue); margin-top: 3px; font-weight: 700; }
+
+/* COOKING */
+.cooking-unlock-banner {
+  background: linear-gradient(135deg, #fff8e1, #ffecb3);
+  border: 2px solid #ffc107;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+  display: flex; gap: 12px;
+  align-items: center;
+}
+.cooking-unlock-banner .icon { font-size: 2.2rem; flex: none; }
+.cooking-unlock-banner .text { flex: 1; font-size: 0.86rem; }
+.cooking-unlock-banner .text strong { font-size: 1rem; color: #e65100; display: block; margin-bottom: 4px; }
+.cooking-unlock-banner.unlocked {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-color: var(--green);
+}
+
+.recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.recipe-card {
+  border: 2px solid #e0e0e0; border-radius: 14px;
+  padding: 12px 10px;
+  background: #fff;
+  display: flex; flex-direction: column;
+  gap: 6px;
+}
+.recipe-card.can-cook { border-color: var(--orange); background: #fff8e1; }
+.recipe-card.cooking { border-color: var(--red); background: #ffebee; }
+.recipe-card.festival { border-color: var(--red); background: linear-gradient(135deg, #fff, #ffe0b2); }
+.recipe-card .emoji { font-size: 2.4rem; text-align: center; }
+.recipe-card .name { font-size: 0.95rem; font-weight: 700; text-align: center; }
+.recipe-ingredients {
+  font-size: 0.75rem; color: #333;
+  text-align: center; line-height: 1.5;
+}
+.recipe-desc { font-size: 0.72rem; color: #888; text-align: center; }
+.recipe-meta {
+  font-size: 0.78rem; color: #555;
+  text-align: center;
+  display: flex; justify-content: center; gap: 6px;
+}
+.recipe-price {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--orange); text-align: center;
+}
+.recipe-missing { font-size: 0.72rem; color: var(--red); text-align: center; line-height: 1.5; }
+.recipe-card .btn { width: 100%; justify-content: center; }
+.cooking-progress {
+  height: 8px; background: #e0e0e0;
+  border-radius: 4px; overflow: hidden;
+  margin-top: 4px;
+}
+.cooking-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--orange), var(--yellow));
+  transition: width .3s;
+}
+
+/* INVENTORY */
+.inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 6px; }
+.inv-item {
+  border: 2px solid #e0e0e0; border-radius: 10px;
+  padding: 6px 4px; text-align: center;
+  background: #fafafa; font-size: 0.7rem;
+}
+.inv-item .emoji { font-size: 1.5rem; }
+.inv-item .count { font-weight: 700; color: var(--green-dark); margin-top: 2px; }
+.inv-empty { color: #aaa; font-size: 0.85rem; text-align: center; padding: 14px; }
+
+/* Festival particles overlay */
+.festive-overlay {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 50;
+  overflow: hidden;
+}
+.festive-overlay .fp {
+  position: absolute; font-size: 1.4rem;
+  opacity: 0;
+  animation: float-down 8s linear infinite;
+}
+@keyframes float-down {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+/* VISIT */
+.visit-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 300;
+  display: none; flex-direction: column;
+  align-items: center; padding: 20px;
+}
+.visit-overlay.active { display: flex; }
+.visit-box {
+  background: #fff; border-radius: 20px;
+  padding: 20px; width: 100%;
+  max-width: 600px; max-height: 90vh; overflow-y: auto;
+}
+.visit-farm-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 6px; margin: 14px 0;
+}
+.visit-cell {
+  aspect-ratio: 1; border-radius: 8px;
+  border: 2px solid #8B6914;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 1.4rem; background: #c8a96e;
+  position: relative; min-height: 55px;
+}
+.visit-cell.ready { background: #33691E; }
+.visit-cell.locked { background: #9e9e9e; }
+
+/* MISC */
+.divider { border: none; border-top: 2px solid #f0f0f0; margin: 12px 0; }
+.flex-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.text-sm { font-size: 0.86rem; color: #666; line-height: 1.5; }
+
+@media(max-width: 500px) {
+  .farm-grid { grid-template-columns: repeat(6, 1fr); gap: 5px; }
+  .cell { font-size: 1.4rem; min-height: 55px; }
+  .crop-grid { grid-template-columns: repeat(3, 1fr); }
+  .modal { padding: 16px; }
+  .recipe-grid { grid-template-columns: repeat(2, 1fr); }
+  .topbar-logo { font-size: 1.1rem; }
+  .stat-pill, .audio-btn { font-size: 0.78rem; padding: 3px 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">🌱</div>
+    <h1>開心農場</h1>
+    <p class="sub">種菜、養動物、釣魚、烹飪、過節慶！</p>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchAuth('login')">登入</button>
+      <button class="tab-btn" onclick="switchAuth('register')">註冊</button>
+    </div>
+    <div id="login-form">
+      <div class="form-group">
+        <label>帳號</label>
+        <input type="text" id="login-user" placeholder="4~12 英數字" maxlength="12">
+      </div>
+      <div class="form-group">
+        <label>密碼</label>
+        <input type="password" id="login-pass" placeholder="4~12 英數字" maxlength="12">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">🌾 登入遊戲</button>
+      <div class="error-msg" id="login-err"></div>
+    </div>
+    <div id="register-form" style="display:none">
+      <div class="form-group">
+        <label>帳號（4~12 英數字）</label>
+        <input type="text" id="reg-user" placeholder="只能英文和數字" maxlength="12">
+      </div>
+      <div class="form-group">
+        <label>密碼（4~12 英數字）</label>
+        <input type="password" id="reg-pass" placeholder="只能英文和數字" maxlength="12">
+      </div>
+      <div class="form-group">
+        <label>農場名稱（1~10 字，支持中英文）</label>
+        <input type="text" id="reg-name" placeholder="我的開心農場" maxlength="10">
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">🌱 建立農場</button>
+      <div class="error-msg" id="reg-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <div class="topbar">
+    <span class="topbar-logo">🌱 開心農場</span>
+    <span class="stat-pill">💰 <span id="hud-money">0</span></span>
+    <span class="stat-pill">⭐ Lv.<span id="hud-level">1</span></span>
+    <span class="stat-pill">✨ <span id="hud-xp">0</span>/<span id="hud-xp-max">100</span>XP</span>
+    <button class="audio-btn" id="btn-sfx" onclick="toggleSfx()" title="音效">📢</button>
+    <button class="audio-btn" id="btn-music" onclick="toggleMusic()" title="背景音樂">🎵 OFF</button>
+    <button class="audio-btn btn-yellow" style="color:#333" onclick="openSection('checkin')">📅 簽到</button>
+    <button class="audio-btn" onclick="doLogout()">登出</button>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="openSection('farm')" id="tab-farm">🌾 農場</button>
+    <button class="nav-tab" onclick="openSection('shop')" id="tab-shop">🏪 商城</button>
+    <button class="nav-tab" onclick="openSection('tasks')" id="tab-tasks">📋 任務</button>
+    <button class="nav-tab" onclick="openSection('neighbors')" id="tab-neighbors">👥 鄰居</button>
+    <button class="nav-tab" onclick="openSection('animals')" id="tab-animals">🐄 動物</button>
+    <button class="nav-tab" onclick="openSection('fishing')" id="tab-fishing">🎣 釣魚</button>
+    <button class="nav-tab" onclick="openSection('cooking')" id="tab-cooking">🍳 烹飪</button>
+    <button class="nav-tab" onclick="openSection('festival')" id="tab-festival">🎊 節慶</button>
+    <button class="nav-tab" onclick="openSection('checkin')" id="tab-checkin">📅 簽到</button>
+    <button class="nav-tab" onclick="openSection('profile')" id="tab-profile">👤 個人</button>
+  </div>
+
+  <!-- FARM -->
+  <div class="section active" id="section-farm">
+    <div id="festival-banner-farm"></div>
+    <div class="farm-header">
+      <h2 class="section-title">🌾 <span id="farm-title">農場</span></h2>
+      <div class="flex-row">
+        <button class="btn btn-sm btn-brown" onclick="doWaterAll()">💧 全部澆水</button>
+        <button class="btn btn-sm btn-orange" onclick="doPesticideAll()">🐛 全部除蟲</button>
+        <button class="btn btn-sm btn-primary" onclick="doHarvestAll()">🧺 全部收成</button>
+      </div>
+    </div>
+    <div id="dog-banner" class="dog-banner" style="display:none">
+      🐕 看門狗守護中！偷菜防護剩 <strong id="dog-days">0</strong> 天
+    </div>
+    <div class="farm-grid" id="farm-grid"></div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="section" id="section-shop">
+    <h2 class="section-title">🏪 <span style="color:var(--green-dark)">商城</span></h2>
+    <div class="card">
+      <div class="card-title">🛡️ 特殊道具</div>
+      <div class="shop-grid" id="shop-special"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌱 種子店</div>
+      <div class="shop-grid" id="shop-seeds"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🐄 動物市場</div>
+      <div class="shop-grid" id="shop-animals"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏡 擴大田地</div>
+      <div id="shop-land"></div>
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="section" id="section-tasks">
+    <h2 class="section-title">📋 任務</h2>
+    <div class="card">
+      <div class="card-title">🎯 每日任務</div>
+      <div class="task-list" id="daily-tasks"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏆 成就任務</div>
+      <div class="task-list" id="achieve-tasks"></div>
+    </div>
+  </div>
+
+  <!-- NEIGHBORS -->
+  <div class="section" id="section-neighbors">
+    <h2 class="section-title">👥 鄰居</h2>
+    <div class="card">
+      <div class="card-title">⭐ 我的好友（<span id="friend-count">0</span>/30）</div>
+      <div class="neighbor-grid" id="friend-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🤖 AI 鄰居（100位）</div>
+      <div class="neighbor-grid" id="ai-neighbor-grid"></div>
+    </div>
+  </div>
+
+  <!-- ANIMALS -->
+  <div class="section" id="section-animals">
+    <h2 class="section-title">🐄 我的動物</h2>
+    <div class="card">
+      <div class="animal-grid" id="my-animals-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 動物說明</div>
+      <p class="text-sm">每位動物每小時自動產生金幣和XP，最多累積8小時。記得定期收取！</p>
+      <div class="animal-rate-grid" id="animal-rate-grid"></div>
+    </div>
+  </div>
+
+  <!-- FISHING -->
+  <div class="section" id="section-fishing">
+    <div id="festival-banner-fish"></div>
+    <h2 class="section-title">🎣 釣魚場</h2>
+    <div class="fishing-card" id="fishing-card">
+      <span class="fishing-wave" id="fishing-wave">🌊</span>
+      <div class="fishing-status" id="fishing-status">點擊下方按鈕開始釣魚</div>
+      <button class="btn btn-primary" id="fishing-btn" onclick="doFish()" style="max-width:300px;margin:0 auto">🎣 開始釣魚</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📖 魚類圖鑑</div>
+      <div class="fish-codex" id="fish-codex"></div>
+    </div>
+  </div>
+
+  <!-- COOKING -->
+  <div class="section" id="section-cooking">
+    <div id="festival-banner-cook"></div>
+    <h2 class="section-title">🔍 烹飪廚房</h2>
+    <div id="cooking-unlock-area"></div>
+    <div class="card">
+      <div class="card-title">📦 食材庫存</div>
+      <div class="inv-grid" id="inv-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🍽️ 食譜列表</div>
+      <div class="recipe-grid" id="recipe-grid"></div>
+    </div>
+  </div>
+
+  <!-- FESTIVAL -->
+  <div class="section" id="section-festival">
+    <h2 class="section-title">🎊 節慶活動</h2>
+    <div id="festival-status-area"></div>
+    <div id="festival-cards-area"></div>
+  </div>
+
+  <!-- CHECKIN -->
+  <div class="section" id="section-checkin">
+    <h2 class="section-title">📅 每日簽到</h2>
+    <div class="card">
+      <p class="text-sm" style="margin-bottom:12px">每天簽到獲得獎勵，連續簽到獎勵更豐厚！</p>
+      <div class="checkin-grid" id="checkin-grid"></div>
+      <button class="btn btn-primary" id="checkin-btn" onclick="doCheckin()">✅ 今日簽到</button>
+      <div class="error-msg" id="checkin-msg" style="color:var(--green-dark)"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 簽到記錄</div>
+      <div class="info-row"><span>連續簽到天數</span><strong id="ci-streak">0</strong> 天</div>
+      <div class="info-row"><span>累計簽到天數</span><strong id="ci-total">0</strong> 天</div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="section" id="section-profile">
+    <h2 class="section-title">👤 個人資料</h2>
+    <div class="card">
+      <div class="profile-info">
+        <div class="profile-avatar" id="profile-avatar-display" onclick="openAvatarPicker()" style="cursor:pointer" title="點擊更換頭像">🧑‍🌾</div>
+        <div class="profile-details">
+          <div class="profile-name" id="prof-name"></div>
+          <div class="profile-level" id="prof-level"></div>
+          <div class="xp-bar-wrap" style="max-width:240px">
+            <div class="xp-bar" id="prof-xp-bar" style="width:0%"></div>
+          </div>
+          <div class="profile-xp-text" id="prof-xp-text"></div>
+          <button class="btn btn-xs btn-orange" onclick="openAvatarPicker()" style="margin-top:6px">🎨 更換頭像</button>
+        </div>
+      </div>
+      <div class="info-row"><span class="label">💰 金幣</span><strong id="prof-money"></strong></div>
+      <div class="info-row"><span class="label">🌾 總收成</span><strong id="prof-harvest"></strong></div>
+      <div class="info-row"><span class="label">🐛 總除蟲</span><strong id="prof-pest"></strong></div>
+      <div class="info-row"><span class="label">💧 總澆水</span><strong id="prof-water"></strong></div>
+      <div class="info-row"><span class="label">🎣 總釣魚</span><strong id="prof-fish"></strong></div>
+      <div class="info-row"><span class="label">🍳 總烹飪</span><strong id="prof-cook"></strong></div>
+      <div class="info-row"><span class="label">📅 連續簽到</span><strong id="prof-streak"></strong></div>
+      <div class="info-row"><span class="label">👥 好友數</span><strong id="prof-friends"></strong></div>
+      <div class="info-row"><span class="label">🏡 田地格數</span><strong id="prof-cells"></strong></div>
+      <div class="info-row"><span class="label">🐄 動物數</span><strong id="prof-animals"></strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="crop-modal">
+  <div class="modal">
+    <h2>🌱 選擇種植</h2>
+    <div class="crop-grid" id="crop-grid"></div>
+    <div class="flex-row">
+      <button class="btn btn-primary" onclick="confirmPlant()">種植</button>
+      <button class="btn" style="background:#e0e0e0;color:#333" onclick="closeModal('crop-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cell-modal">
+  <div class="modal">
+    <h2 id="cell-modal-title">🌿 操作</h2>
+    <div id="cell-modal-info" style="margin-bottom:14px;font-size:0.9rem;color:#555"></div>
+    <div class="flex-row" id="cell-modal-actions"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catch-modal">
+  <div class="modal" style="text-align:center;max-width:340px">
+    <h2 id="catch-title">🎣 釣到了！</h2>
+    <div id="catch-emoji" style="font-size:5rem;margin:16px 0">🐟</div>
+    <div id="catch-name" style="font-size:1.2rem;font-weight:700;margin-bottom:8px"></div>
+    <div id="catch-rarity" style="margin-bottom:10px"></div>
+    <div id="catch-reward" style="color:var(--orange);font-weight:700;margin-bottom:16px"></div>
+    <button class="btn btn-primary" onclick="closeModal('catch-modal')">收下</button>
+  </div>
+</div>
+
+<div class="visit-overlay" id="visit-overlay">
+  <div class="visit-box">
+    <div class="flex-row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 id="visit-title">鄰居的農場</h2>
+      <button class="btn btn-sm" style="background:#e0e0e0;color:#333" onclick="closeVisit()">✕ 關閉</button>
+    </div>
+    <p id="visit-desc" class="text-sm"></p>
+    <div class="visit-farm-grid" id="visit-farm-grid"></div>
+    <div class="flex-row">
+      <button class="btn btn-sm btn-blue" onclick="visitWaterAll()">💧 幫忙澆水</button>
+      <button class="btn btn-sm btn-orange" onclick="visitPestAll()">🐛 幫忙除蟲</button>
+      <button class="btn btn-sm btn-red" onclick="visitStealAll()">🥕 偷菜</button>
+    </div>
+    <div class="error-msg" id="visit-msg" style="color:var(--green-dark);margin-top:8px"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="avatar-modal">
+  <div class="modal" style="max-width:540px">
+    <h2>🎨 選擇頭像</h2>
+    <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:16px;max-height:360px;overflow-y:auto"></div>
+    <button class="btn" style="background:#e0e0e0;color:#333" onclick="closeModal('avatar-modal')">取消</button>
+  </div>
+</div>
+
+<div class="festive-overlay" id="festive-overlay"></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const CROPS = [
+  { id:'carrot',     name:'紅蘿蔔', emoji:'🥕', growTime:30, sellPrice:12,  buyPrice:5,  xp:5,  pestChance:0.15, wiltTime:120 },
+  { id:'potato',     name:'馬鈴薯', emoji:'🥔', growTime:60, sellPrice:20,  buyPrice:8,  xp:8,  pestChance:0.12, wiltTime:180 },
+  { id:'tomato',     name:'番茄',   emoji:'🍅', growTime:90, sellPrice:30,  buyPrice:12, xp:12, pestChance:0.18, wiltTime:200 },
+  { id:'corn',       name:'玉米',   emoji:'🌽', growTime:120,sellPrice:45,  buyPrice:18, xp:15, pestChance:0.10, wiltTime:240 },
+  { id:'cabbage',    name:'高麗菜', emoji:'🥬', growTime:150,sellPrice:60,  buyPrice:24, xp:18, pestChance:0.13, wiltTime:300 },
+  { id:'pepper',     name:'辣椒',   emoji:'🌶️', growTime:180,sellPrice:80,  buyPrice:30, xp:22, pestChance:0.20, wiltTime:360 },
+  { id:'melon',      name:'西瓜',   emoji:'🍉', growTime:240,sellPrice:120, buyPrice:45, xp:30, pestChance:0.08, wiltTime:480 },
+  { id:'grape',      name:'葡萄',   emoji:'🍇', growTime:300,sellPrice:180, buyPrice:65, xp:40, pestChance:0.15, wiltTime:600 },
+  { id:'strawberry', name:'草莓',   emoji:'🍓', growTime:200,sellPrice:150, buyPrice:55, xp:35, pestChance:0.22, wiltTime:400 },
+  { id:'pumpkin',    name:'南瓜',   emoji:'🎃', growTime:360,sellPrice:250, buyPrice:90, xp:50, pestChance:0.10, wiltTime:720 },
+  { id:'apple',      name:'蘋果',   emoji:'🍎', growTime:480,sellPrice:350, buyPrice:120,xp:60, pestChance:0.10, wiltTime:900 },
+  { id:'wheat',      name:'小麥',   emoji:'🌾', growTime:45, sellPrice:15,  buyPrice:6,  xp:6,  pestChance:0.08, wiltTime:150 },
+];
+
+const ANIMALS = [
+  { id:'chicken', name:'雞', emoji:'🐔', buyPrice:200, incomePerHr:15, xpPerHr:5,  collect:'雞蛋🥚', productId:'egg',  productEmoji:'🥚', productName:'雞蛋' },
+  { id:'duck',    name:'鴨', emoji:'🦆', buyPrice:250, incomePerHr:18, xpPerHr:6,  collect:'鴨蛋🥚', productId:'duck_egg', productEmoji:'🥚', productName:'鴨蛋' },
+  { id:'rabbit',  name:'兔', emoji:'🐰', buyPrice:300, incomePerHr:20, xpPerHr:8,  collect:'兔毛🪶', productId:'fur',  productEmoji:'🪶', productName:'兔毛' },
+  { id:'pig',     name:'豬', emoji:'🐷', buyPrice:500, incomePerHr:30, xpPerHr:10, collect:'培根🥓', productId:'bacon',productEmoji:'🥓', productName:'培根' },
+  { id:'sheep',   name:'羊', emoji:'🐑', buyPrice:600, incomePerHr:40, xpPerHr:12, collect:'羊毛🧶', productId:'wool', productEmoji:'🧶', productName:'羊毛' },
+  { id:'cow',     name:'牛', emoji:'🐄', buyPrice:800, incomePerHr:50, xpPerHr:15, collect:'牛奶🥛', productId:'milk', productEmoji:'🥛', productName:'牛奶' },
+];
+
+const SHOP_SPECIALS = [
+  { id:'dog7',         name:'看門狗（3天）', emoji:'🐕', price:10000, desc:'防止鄰居偷菜，保護農場3天', days:3 },
+  { id:'fertilizer',   name:'超級肥料',     emoji:'🧪', price:300,  desc:'立即加速所有作物成長50%', type:'fertilizer' },
+  { id:'pest_spray',   name:'全農殺蟲劑',   emoji:'🪲', price:200,  desc:'立即清除所有蟲害', type:'pestall' },
+  { id:'rain',         name:'人工降雨',     emoji:'🌧️', price:150,  desc:'立即澆灌所有農作物', type:'waterall' },
+  { id:'chef_book',    name:'大廚食譜',     emoji:'📚', price:3000, desc:'解鎖全部高級食譜', type:'chefbook' },
+];
+
+const LAND_PRICES = [0,0,0,0,0,0, 500,600,700,800,900,1000, 1200,1400,1600,1800,2000,2200, 2500,2800,3200,3600,4000,4500, 5000,5500,6000,6500,7000,7500, 8000,8500,9000,9500,10000,10500];
+
+const AI_NAMES = ['小花','小明','小美','大壯','阿嬤','彩虹','阿虎','小豬','天空','月亮','星星','玫瑰','茉莉','菊花','向日葵','大樹','小草','溪流','山丘','春風','夏日','秋葉','冬雪','曉晨','暮雲','清風','碧水','金陽','銀月','翠竹','紅梅','白鶴','紫燕','綠柳','黃菊','蒼松','碧桃','彩蝶','鳴鳳','靈鹿','祥瑞','福祿','壽星','吉祥','如意','平安','康健','快樂','幸福','美麗','丰盛','繁榮','昌盛','興旺','順利','成功','勝利','榮耀','光明','希望','夢想','努力','堅持','奮鬥','拼搏','超越','卓越','優秀','傑出','非凡','出眾','精彩','燦爛','輝煌','偉大','崇高','高尚','純潔','善良','勇敢','智慧','寬容','誠信','忠誠','正直','仁愛','博愛','友善','和諧','溫暖','溫馨','感動','幸運','緣分'];
+
+const LEVEL_XP = [0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000,13000,15500,18500,22000,26000];
+
+/* ===== FISHING ===== */
+const FISHES = [
+  { id:'crucian', name:'鯽魚',  emoji:'🐟', rarity:'普通', rarityStars:1, sellPrice:15,  xp:8,   weight:32 },
+  { id:'grass',   name:'草魚',  emoji:'🐠', rarity:'普通', rarityStars:1, sellPrice:20,  xp:10,  weight:26 },
+  { id:'bass',    name:'鱸魚',  emoji:'🐡', rarity:'少見', rarityStars:2, sellPrice:55,  xp:18,  weight:14 },
+  { id:'catfish', name:'鯰魚',  emoji:'🐟', rarity:'少見', rarityStars:2, sellPrice:70,  xp:22,  weight:11 },
+  { id:'squid',   name:'魷魚',  emoji:'🦑', rarity:'稀有', rarityStars:3, sellPrice:120, xp:30,  weight:7 },
+  { id:'octopus', name:'章魚',  emoji:'🐙', rarity:'稀有', rarityStars:3, sellPrice:160, xp:38,  weight:5 },
+  { id:'crab',    name:'螃蟹',  emoji:'🦀', rarity:'罕見', rarityStars:4, sellPrice:240, xp:55,  weight:3 },
+  { id:'lobster', name:'龍蝦',  emoji:'🦞', rarity:'罕見', rarityStars:4, sellPrice:380, xp:80,  weight:1.5 },
+  { id:'shark',   name:'鯊魚',  emoji:'🦈', rarity:'傳說', rarityStars:5, sellPrice:900, xp:180, weight:0.5 },
+];
+const BAIT_COST = 20;
+
+/* ===== COOKING RECIPES =====
+   First 8 are free (basic). Rest require chef_book purchase. */
+const RECIPES = [
+  // ----- BASIC (8) -----
+  { id:'salad',    name:'蔬菜沙拉', emoji:'🥗', desc:'清爽可口的沙拉',  cookTime:15, sellPrice:80,  xp:30,
+    ingredients:{ carrot:1, cabbage:1, tomato:1 }, premium:false },
+  { id:'soup',     name:'蔬菜湯',   emoji:'🍲', desc:'暖心的蔬菜湯',   cookTime:15, sellPrice:80,  xp:30,
+    ingredients:{ carrot:2, potato:1 }, premium:false },
+  { id:'ketchup',  name:'番茄醬',   emoji:'🍯', desc:'香濃番茄醬',     cookTime:10, sellPrice:60,  xp:20,
+    ingredients:{ tomato:3 }, premium:false },
+  { id:'cornbread',name:'玉米麵包', emoji:'🍞', desc:'香甜玉米麵包',   cookTime:20, sellPrice:100, xp:40,
+    ingredients:{ corn:2, wheat:2 }, premium:false },
+  { id:'fishsoup', name:'魚湯',     emoji:'🍜', desc:'鮮美魚湯',       cookTime:12, sellPrice:90,  xp:35,
+    ingredients:{ crucian:1, cabbage:1 }, premium:false },
+  { id:'cake',     name:'草莓蛋糕', emoji:'🍰', desc:'甜蜜草莓蛋糕',   cookTime:25, sellPrice:160, xp:60,
+    ingredients:{ strawberry:2, milk:1 }, premium:false },
+  { id:'pie',      name:'蘋果派',   emoji:'🥧', desc:'酥脆蘋果派',     cookTime:30, sellPrice:180, xp:70,
+    ingredients:{ apple:2, wheat:2 }, premium:false },
+  { id:'stew',     name:'馬鈴薯燉肉',emoji:'🍛', desc:'豐盛燉肉',       cookTime:35, sellPrice:200, xp:80,
+    ingredients:{ potato:2, carrot:1, bacon:1 }, premium:false },
+  // ----- PREMIUM (7, require chef_book) -----
+  { id:'grilled',  name:'烤魚',     emoji:'🐟', desc:'香烤鱸魚',       cookTime:20, sellPrice:140, xp:55,
+    ingredients:{ bass:1, pepper:1 }, premium:true },
+  { id:'sushi',    name:'壽司',     emoji:'🍣', desc:'精緻壽司',       cookTime:28, sellPrice:220, xp:85,
+    ingredients:{ catfish:1, wheat:2 }, premium:true },
+  { id:'wine',     name:'葡萄酒',   emoji:'🍷', desc:'醇厚葡萄酒',     cookTime:45, sellPrice:280, xp:110,
+    ingredients:{ grape:3 }, premium:true },
+  { id:'pumpkinsoup',name:'南瓜濃湯',emoji:'🥣', desc:'香濃南瓜湯',     cookTime:30, sellPrice:240, xp:95,
+    ingredients:{ pumpkin:1, milk:1 }, premium:true },
+  { id:'omelette', name:'番茄炒蛋', emoji:'🍳', desc:'家常美味',       cookTime:18, sellPrice:140, xp:50,
+    ingredients:{ egg:2, tomato:1 }, premium:true },
+  { id:'pizza',    name:'辣味披薩', emoji:'🍕', desc:'熱辣披薩',       cookTime:35, sellPrice:280, xp:110,
+    ingredients:{ wheat:2, tomato:1, pepper:2 }, premium:true },
+  { id:'seafood',  name:'海鮮拼盤', emoji:'🍤', desc:'豪華海鮮',       cookTime:60, sellPrice:600, xp:220,
+    ingredients:{ shark:1, lobster:1, pepper:1 }, premium:true },
+];
+
+/* ===== FESTIVALS =====
+   Each festival has a list of date ranges and tasks. */
+const FESTIVALS = [
+  {
+    id:'spring',
+    name:'春節',
+    emoji:'🧧',
+    particle:'🧧',
+    desc:'農曆新年大喜！特殊作物快速生長，收穫加倍！',
+    buffText:'豐收加成 ×2 ｜ 每日獎勵 💰200',
+    multiplier:{ harvest:2, fish:1, animal:1, cook:1 },
+    dailyBonus:200,
+    ranges:[
+      ['2024-02-10','2024-02-17'],['2025-01-29','2025-02-05'],['2026-02-17','2026-02-24'],
+      ['2027-02-06','2027-02-13'],['2028-01-26','2028-02-02'],['2029-02-13','2029-02-20'],
+      ['2030-02-03','2030-02-10'],
+    ],
+    tasks:[
+      { id:'sp1', name:'紅包滿滿', emoji:'🧧', desc:'節慶期間收成5次', target:5, type:'harvest', rewardMoney:300, rewardXp:100 },
+      { id:'sp2', name:'年年有魚', emoji:'🐟', desc:'節慶期間釣魚3條', target:3, type:'fish',    rewardMoney:200, rewardXp:80 },
+      { id:'sp3', name:'豐衣足食', emoji:'🍱', desc:'節慶期間烹飪2道', target:2, type:'cook',    rewardMoney:250, rewardXp:90 },
+    ]
+  },
+  {
+    id:'dragon',
+    name:'端午節',
+    emoji:'🐲',
+    particle:'🍙',
+    desc:'端午划龍舟！魚兒特別多，釣魚機率提升！',
+    buffText:'豐收加成 ×1.5 ｜ 每日獎勵 💰150',
+    multiplier:{ harvest:1.5, fish:1.5, animal:1, cook:1 },
+    dailyBonus:150,
+    ranges:[
+      ['2024-06-08','2024-06-12'],['2025-05-29','2025-06-02'],['2026-06-17','2026-06-21'],
+      ['2027-06-07','2027-06-11'],['2028-05-26','2028-05-30'],['2029-06-14','2029-06-18'],
+      ['2030-06-03','2030-06-07'],
+    ],
+    tasks:[
+      { id:'dr1', name:'粽子飄香', emoji:'🍙', desc:'節慶期間烹飪3道',  target:3, type:'cook',    rewardMoney:200, rewardXp:80 },
+      { id:'dr2', name:'漁獲豐收', emoji:'🐠', desc:'節慶期間釣魚5條',  target:5, type:'fish',    rewardMoney:250, rewardXp:100 },
+      { id:'dr3', name:'豐衣足食', emoji:'🌾', desc:'節慶期間收成6次',  target:6, type:'harvest', rewardMoney:200, rewardXp:80 },
+    ]
+  },
+  {
+    id:'moon',
+    name:'中秋節',
+    emoji:'🌕',
+    particle:'🥮',
+    desc:'月圓人團圓！動物產出加成，月餅大開放！',
+    buffText:'動物產出 ×1.5 ｜ 每日獎勵 💰150',
+    multiplier:{ harvest:1, fish:1, animal:1.5, cook:1.5 },
+    dailyBonus:150,
+    ranges:[
+      ['2024-09-15','2024-09-19'],['2025-10-04','2025-10-08'],['2026-09-23','2026-09-27'],
+      ['2027-09-13','2027-09-17'],['2028-10-01','2028-10-05'],['2029-09-20','2029-09-24'],
+      ['2030-09-09','2030-09-13'],
+    ],
+    tasks:[
+      { id:'mo1', name:'月餅大師', emoji:'🥮', desc:'節慶期間烹飪3道',  target:3, type:'cook',    rewardMoney:250, rewardXp:90 },
+      { id:'mo2', name:'賞月豐收', emoji:'🌾', desc:'節慶期間收成8次',  target:8, type:'harvest', rewardMoney:200, rewardXp:80 },
+      { id:'mo3', name:'家畜興旺', emoji:'🐄', desc:'節慶期間收取動物3次', target:3, type:'animal', rewardMoney:200, rewardXp:80 },
+    ]
+  },
+  {
+    id:'christmas',
+    name:'聖誕節',
+    emoji:'🎄',
+    particle:'❄️',
+    desc:'白色聖誕節！全部收益加倍，聖誕料理開放！',
+    buffText:'全部收益 ×1.5 ｜ 每日獎勵 💰250',
+    multiplier:{ harvest:1.5, fish:1.5, animal:1.5, cook:1.5 },
+    dailyBonus:250,
+    ranges:[
+      ['2024-12-24','2024-12-26'],['2025-12-24','2025-12-26'],['2026-12-24','2026-12-26'],
+      ['2027-12-24','2027-12-26'],['2028-12-24','2028-12-26'],['2029-12-24','2029-12-26'],
+      ['2030-12-24','2030-12-26'],
+    ],
+    tasks:[
+      { id:'ch1', name:'聖誕餐桌', emoji:'🦃', desc:'節慶期間烹飪3道',  target:3, type:'cook',    rewardMoney:300, rewardXp:100 },
+      { id:'ch2', name:'雪花飄飄', emoji:'❄️', desc:'節慶期間收成10次', target:10,type:'harvest', rewardMoney:300, rewardXp:120 },
+      { id:'ch3', name:'平安喜樂', emoji:'🎁', desc:'節慶期間拜訪鄰居3次', target:3, type:'visit', rewardMoney:200, rewardXp:80 },
+    ]
+  },
+];
+
+/* ===== Helpers for inventory item info ===== */
+function getItemInfo(id){
+  const c = CROPS.find(x=>x.id===id);
+  if(c) return { name:c.name, emoji:c.emoji };
+  const f = FISHES.find(x=>x.id===id);
+  if(f) return { name:f.name, emoji:f.emoji };
+  const a = ANIMALS.find(x=>x.productId===id);
+  if(a) return { name:a.productName, emoji:a.productEmoji };
+  return { name:id, emoji:'❓' };
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let G = null;
+let aiNeighbors = [];
+const NOW = () => Date.now();
+
+function getDB(){ return JSON.parse(localStorage.getItem('hf_db')||'{}'); }
+function saveDB(db){ localStorage.setItem('hf_db', JSON.stringify(db)); }
+function saveG(){
+  if(!G) return;
+  const db = getDB();
+  db[G.username] = G;
+  saveDB(db);
+}
+
+function defaultState(username, farmName){
+  const cells = [];
+  for(let i=0;i<36;i++){
+    cells.push({ state:'empty', cropId:null, plantedAt:null, wateredAt:null, pest:false, locked: i>=6 });
+  }
+  return {
+    username, farmName,
+    money: 1000, xp: 0, level: 1,
+    cells, animals: [], friends: [], dog: null,
+    dailyTasks: null,
+    achievements: {},
+    checkin: { lastDate: null, streak: 0, total: 0 },
+    stats: { harvested:0, watered:0, pested:0, fished:0, cooked:0, visited:0 },
+    inventory: {},
+    cookingJobs: [],
+    fishCaught: {},
+    festivalTasks: {},    // { festivalYearKey: { taskId: { progress, claimed } } }
+    festivalDaily: {},    // { festivalYearKey: { date: claimed } }
+    chefBookOwned: false,
+    settings: { sfx: true, music: false },
+    lastAiTick: NOW(),
+    cooldowns: {},
+    avatar: '🧑‍🌾',
+  };
+}
+
+function migrateState(){
+  if(!G.stats) G.stats = {};
+  ['harvested','watered','pested','fished','cooked','visited'].forEach(k=>{
+    if(G.stats[k]===undefined) G.stats[k]=0;
+  });
+  if(!G.inventory) G.inventory = {};
+  if(!G.cookingJobs) G.cookingJobs = [];
+  if(!G.fishCaught) G.fishCaught = {};
+  if(!G.festivalTasks) G.festivalTasks = {};
+  if(!G.festivalDaily) G.festivalDaily = {};
+  if(G.chefBookOwned===undefined) G.chefBookOwned = false;
+  if(!G.settings) G.settings = { sfx: true, music: false };
+  if(G.settings.sfx===undefined) G.settings.sfx = true;
+  if(G.settings.music===undefined) G.settings.music = false;
+  if(!G.cooldowns) G.cooldowns = {};
+  if(!G.avatar) G.avatar = '🧑‍🌾';
+}
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+function switchAuth(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[tab==='login'?0:1].classList.add('active');
+  document.getElementById('login-form').style.display = tab==='login'?'':'none';
+  document.getElementById('register-form').style.display = tab==='register'?'':'none';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('reg-err').textContent='';
+}
+function validateCredential(val){ return /^[a-zA-Z0-9]{4,12}$/.test(val); }
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-err');
+  if(!validateCredential(u)||!validateCredential(p)){ err.textContent='帳號和密碼需4~12英數字'; return; }
+  const db = getDB();
+  if(!db[u]){ err.textContent='帳號不存在'; return; }
+  if(db[u].password !== p){ err.textContent='密碼錯誤'; return; }
+  G = db[u];
+  migrateState();
+  initGame();
+}
+function doRegister(){
+  const u = document.getElementById('reg-user').value.trim();
+  const p = document.getElementById('reg-pass').value;
+  const n = document.getElementById('reg-name').value.trim();
+  const err = document.getElementById('reg-err');
+  if(!validateCredential(u)){ err.textContent='帳號需4~12英數字'; return; }
+  if(!validateCredential(p)){ err.textContent='密碼需4~12英數字'; return; }
+  if(!n||n.length>10){ err.textContent='農場名稱1~10字'; return; }
+  const db = getDB();
+  if(db[u]){ err.textContent='帳號已存在'; return; }
+  G = defaultState(u, n);
+  G.password = p;
+  saveG();
+  initGame();
+}
+function doLogout(){
+  stopMusic();
+  saveG();
+  G = null;
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function initGame(){
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  initAiNeighbors();
+  resetDailyIfNeeded();
+  tickAiFarms();
+  applyFestivalDailyBonus();
+  renderAll();
+  openSection('farm');
+  setInterval(()=>{ if(G)saveG(); },30000);
+  setInterval(()=>{ if(G){tickCrops();renderFarm();} },15000);
+  setInterval(()=>{ if(G){tickAnimals();} },60000);
+  setInterval(()=>{ if(G){tickCooking();} },1000);
+  setInterval(()=>{ if(G){tickAiFarms(); tickAiNeighborBehavior();} },60000);
+  // friend help every 2 min
+  setInterval(()=>{
+    if(!G || G.friends.length===0) return;
+    G.cells.forEach(cell=>{
+      if(!cell.locked&&(cell.state==='planted'||cell.state==='growing')&&Math.random()<0.1){
+        if(cell.plantedAt) cell.plantedAt -= 2*60*1000;
+      }
+    });
+    renderFarm();
+  }, 120000);
+}
+
+function initAiNeighbors(){
+  const stored = localStorage.getItem('hf_ai_neighbors');
+  if(stored){
+    try { aiNeighbors = JSON.parse(stored); } catch(e){ aiNeighbors = []; }
+    if(aiNeighbors.length===100) return;
+  }
+  aiNeighbors = AI_NAMES.map((name, i)=>{
+    const cells = [];
+    for(let j=0;j<36;j++){
+      cells.push({ state:'empty', cropId:null, plantedAt:null, wateredAt:null, pest:false, locked: j>=12 });
+    }
+    for(let j=0;j<8;j++){
+      if(Math.random()>0.3){
+        const c = CROPS[Math.floor(Math.random()*CROPS.length)];
+        cells[j].state = 'ready';
+        cells[j].cropId = c.id;
+        cells[j].plantedAt = NOW() - c.growTime*60*1000;
+        cells[j].wateredAt = NOW();
+        cells[j].pest = Math.random()<0.15;
+      }
+    }
+    return { id:i, name, level: 1+Math.floor(Math.random()*15), cells };
+  });
+  saveAiNeighbors();
+}
+function saveAiNeighbors(){ localStorage.setItem('hf_ai_neighbors', JSON.stringify(aiNeighbors)); }
+
+function tickAiFarms(){
+  const now = NOW();
+  aiNeighbors.forEach(ai=>{
+    ai.cells.forEach(cell=>{
+      if(cell.locked) return;
+      if(cell.pest && Math.random()<0.3) cell.pest = false;
+      if(cell.state==='ready') return;
+      if(cell.state==='empty'){
+        if(Math.random()<0.15){
+          const c = CROPS[Math.floor(Math.random()*CROPS.length)];
+          cell.cropId=c.id; cell.state='planted'; cell.plantedAt=now; cell.wateredAt=now; cell.pest=false;
+        }
+        return;
+      }
+      if(cell.state==='planted'||cell.state==='growing'){
+        const c = CROPS.find(x=>x.id===cell.cropId);
+        if(!c) return;
+        const elapsed = (now-cell.plantedAt)/1000/60;
+        if(elapsed >= c.growTime){ cell.state='ready'; }
+        else if(elapsed >= c.growTime*0.5){ cell.state='growing'; }
+      }
+    });
+  });
+  saveAiNeighbors();
+}
+
+/* ============================================================
+   DAILY RESET & TASKS
+   ============================================================ */
+function resetDailyIfNeeded(){
+  const today = new Date().toDateString();
+  if(G.lastDailyReset !== today){
+    G.lastDailyReset = today;
+    G.dailyTasks = generateDailyTasks();
+    saveG();
+  }
+}
+function generateDailyTasks(){
+  return [
+    { id:'dt1', name:'今日豐收', desc:'今日收穫5次',    emoji:'🧺', target:5, progress:0, done:false, rewardMoney:100, rewardXp:30 },
+    { id:'dt2', name:'澆水達人', desc:'今日澆水3次',    emoji:'💧', target:3, progress:0, done:false, rewardMoney:60,  rewardXp:20 },
+    { id:'dt3', name:'除蟲勇士', desc:'今日除蟲2次',    emoji:'🐛', target:2, progress:0, done:false, rewardMoney:80,  rewardXp:25 },
+    { id:'dt4', name:'好鄰居',   desc:'今日拜訪1位鄰居',emoji:'👥', target:1, progress:0, done:false, rewardMoney:50,  rewardXp:15 },
+    { id:'dt5', name:'勤勞農夫', desc:'今日種植5格',    emoji:'🌱', target:5, progress:0, done:false, rewardMoney:120, rewardXp:35 },
+    { id:'dt6', name:'垂釣達人', desc:'今日釣魚3次',    emoji:'🎣', target:3, progress:0, done:false, rewardMoney:90,  rewardXp:28 },
+    { id:'dt7', name:'廚藝精進', desc:'今日烹飪1道菜',  emoji:'🍳', target:1, progress:0, done:false, rewardMoney:80,  rewardXp:25 },
+  ];
+}
+function getAchieveTasks(){
+  return [
+    { id:'ac1', name:'豐收大師',   desc:'累計收穫50次',    emoji:'🏆', target:50,   key:'harvested', rewardMoney:500,  rewardXp:200 },
+    { id:'ac2', name:'澆水100次',  desc:'累計澆水100次',   emoji:'💧', target:100,  key:'watered',   rewardMoney:300,  rewardXp:150 },
+    { id:'ac3', name:'除蟲專家',   desc:'累計除蟲30次',    emoji:'🐛', target:30,   key:'pested',    rewardMoney:400,  rewardXp:180 },
+    { id:'ac4', name:'動物之友',   desc:'擁有3種動物',     emoji:'🐄', target:3,    key:'animals',   rewardMoney:600,  rewardXp:220 },
+    { id:'ac5', name:'土地富翁',   desc:'解鎖18格以上',    emoji:'🏡', target:18,   key:'cells',     rewardMoney:800,  rewardXp:300 },
+    { id:'ac6', name:'萬元戶',     desc:'擁有10000元',     emoji:'💰', target:10000,key:'money',     rewardMoney:1000, rewardXp:400 },
+    { id:'ac7', name:'釣魚達人',   desc:'累計釣魚20條',    emoji:'🎣', target:20,   key:'fished',    rewardMoney:500,  rewardXp:200 },
+    { id:'ac8', name:'大廚',       desc:'累計烹飪10道',    emoji:'👨‍🍳', target:10,   key:'cooked',    rewardMoney:600,  rewardXp:250 },
+  ];
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderAll(){
+  renderHUD();
+  renderAudioButtons();
+  renderFarm();
+  renderShop();
+  renderTasks();
+  renderNeighbors();
+  renderAnimals();
+  renderFishing();
+  renderCooking();
+  renderFestival();
+  renderProfile();
+  renderCheckin();
+  renderFestiveOverlay();
+}
+function renderHUD(){
+  if(!G) return;
+  document.getElementById('hud-money').textContent = G.money;
+  document.getElementById('hud-level').textContent = G.level;
+  document.getElementById('hud-xp').textContent = G.xp;
+  document.getElementById('hud-xp-max').textContent = getXpNeeded(G.level);
+}
+function renderAudioButtons(){
+  if(!G || !G.settings) return;
+  const sfxBtn = document.getElementById('btn-sfx');
+  const musicBtn = document.getElementById('btn-music');
+  if(G.settings.sfx){ sfxBtn.classList.remove('off'); sfxBtn.textContent = '📢'; }
+  else { sfxBtn.classList.add('off'); sfxBtn.textContent = '🔇'; }
+  musicBtn.textContent = G.settings.music ? '🎵 ON' : '🎵 OFF';
+  musicBtn.classList.toggle('off', !G.settings.music);
+}
+function getXpNeeded(level){
+  return LEVEL_XP[Math.min(level, LEVEL_XP.length-1)] || (level * 1000);
+}
+
+/* ===== FARM ===== */
+function renderFarm(){
+  if(!G) return;
+  document.getElementById('farm-title').textContent = G.farmName;
+  tickCrops();
+  // Update cooldown buttons
+  const COOLDOWN = 3*60*1000;
+  const wRemain = Math.max(0, COOLDOWN - (NOW()-(G.cooldowns.waterAll||0)));
+  const pRemain = Math.max(0, COOLDOWN - (NOW()-(G.cooldowns.pestAll||0)));
+  const waterBtn = document.querySelector('button[onclick="doWaterAll()"]');
+  const pestBtn = document.querySelector('button[onclick="doPesticideAll()"]');
+  if(waterBtn){ waterBtn.textContent = wRemain>0 ? `💧 澆水(${Math.ceil(wRemain/60000)}分)` : '💧 全部澆水'; waterBtn.disabled = wRemain>0; }
+  if(pestBtn){ pestBtn.textContent = pRemain>0 ? `🐛 除蟲(${Math.ceil(pRemain/60000)}分)` : '🐛 全部除蟲'; pestBtn.disabled = pRemain>0; }
+  const dogBanner = document.getElementById('dog-banner');
+  if(G.dog && G.dog > NOW()){
+    dogBanner.style.display='flex';
+    document.getElementById('dog-days').textContent = Math.ceil((G.dog - NOW())/86400000);
+  } else {
+    dogBanner.style.display='none';
+    if(G.dog && G.dog <= NOW()) G.dog = null;
+  }
+  renderFestivalBanner('festival-banner-farm');
+  const grid = document.getElementById('farm-grid');
+  grid.innerHTML='';
+  G.cells.forEach((cell, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'cell';
+    if(cell.locked){
+      div.classList.add('locked');
+      const price = LAND_PRICES[idx];
+      div.innerHTML = `<span class="lock-icon">🔒</span><span class="lock-price">💰${price}</span>`;
+      div.onclick = ()=>tryUnlockCell(idx);
+    } else if(cell.state==='empty'){
+      div.classList.add('empty');
+      div.innerHTML = `<span style="font-size:1.2rem;opacity:0.5">＋</span>`;
+      div.onclick = ()=>openPlantModal(idx);
+    } else {
+      const crop = CROPS.find(c=>c.id===cell.cropId);
+      div.classList.add(cell.state);
+      let emoji = crop ? crop.emoji : '🌿';
+      let label = crop ? crop.name : '';
+      const pestLabel = cell.pest ? '<br>🐛蟲' : '';
+      if(cell.state==='planted') label += ' 剛種';
+      else if(cell.state==='growing') label += ' 成長中';
+      else if(cell.state==='ready') label += ' 可收成';
+      else if(cell.state==='withered') { emoji='🍂'; label='已枯萎'; }
+      let progress = 0;
+      if(crop && cell.plantedAt && cell.state!=='ready' && cell.state!=='withered'){
+        const elapsed = (NOW()-cell.plantedAt)/1000/60;
+        progress = Math.min(100, (elapsed/crop.growTime)*100);
+      } else if(cell.state==='ready'){ progress=100; }
+      div.innerHTML = `${emoji}<span class="cell-label">${label}${pestLabel}</span><div class="progress-bar-mini" style="width:${progress}%"></div>`;
+      div.onclick = ()=>openCellAction(idx);
+    }
+    grid.appendChild(div);
+  });
+}
+
+function tickCrops(){
+  if(!G) return;
+  const now = NOW();
+  G.cells.forEach(cell=>{
+    if(cell.locked || cell.state==='empty' || cell.state==='withered' || cell.state==='ready') return;
+    const crop = CROPS.find(c=>c.id===cell.cropId);
+    if(!crop) return;
+    const elapsed = (now - cell.plantedAt)/1000/60;
+    if(elapsed >= crop.growTime + crop.wiltTime){ cell.state = 'withered'; }
+    else if(elapsed >= crop.growTime){
+      cell.state = 'ready';
+      if(Math.random() < crop.pestChance * 0.5) cell.pest = true;
+    } else if(elapsed >= crop.growTime * 0.5){
+      cell.state = 'growing';
+      if(Math.random() < crop.pestChance * 0.1) cell.pest = true;
+    } else { cell.state = 'planted'; }
+  });
+}
+
+function tickAnimals(){
+  if(!G) return;
+  const now = NOW();
+  G.animals.forEach(a=>{
+    const def = ANIMALS.find(x=>x.id===a.id);
+    if(!def) return;
+    const hours = (now - a.lastCollect)/3600000;
+    if(hours >= 1){
+      const mult = festivalMult('animal');
+      const income = Math.floor(def.incomePerHr * hours * mult);
+      const xpGain = Math.floor(def.xpPerHr * hours);
+      G.money += income;
+      addXp(xpGain);
+      // also give product to inventory
+      const productAmt = Math.min(8, Math.floor(hours));
+      if(productAmt>0) addInventory(def.productId, productAmt);
+      a.lastCollect = now;
+      toast(`${def.emoji} ${def.name}產出 +💰${income}`);
+    }
+  });
+  renderHUD(); saveG();
+}
+
+/* ===== Plant / Cell action ===== */
+let selectedCellIdx = null, selectedCropId = null;
+function openPlantModal(idx){
+  selectedCellIdx = idx; selectedCropId = null;
+  const grid = document.getElementById('crop-grid');
+  grid.innerHTML='';
+  CROPS.forEach(crop=>{
+    const canAfford = G.money >= crop.buyPrice;
+    const div = document.createElement('div');
+    div.className = 'crop-card';
+    div.style.opacity = canAfford?'1':'0.5';
+    div.innerHTML = `<div class="emoji">${crop.emoji}</div>
+      <div class="name">${crop.name}</div>
+      <div class="info">⏱${crop.growTime}分 💰${crop.buyPrice}</div>
+      <div class="info">賣價:💰${crop.sellPrice} ✨${crop.xp}XP</div>`;
+    if(canAfford){
+      div.onclick = ()=>{
+        document.querySelectorAll('.crop-card').forEach(c=>c.classList.remove('selected'));
+        div.classList.add('selected');
+        selectedCropId = crop.id;
+        playSfx('click');
+      };
+    }
+    grid.appendChild(div);
+  });
+  document.getElementById('crop-modal').classList.add('active');
+}
+function confirmPlant(){
+  if(!selectedCropId){ toast('請選擇作物'); return; }
+  if(selectedCellIdx===null) return;
+  const crop = CROPS.find(c=>c.id===selectedCropId);
+  if(G.money < crop.buyPrice){ toast('金幣不足！'); return; }
+  G.money -= crop.buyPrice;
+  const cell = G.cells[selectedCellIdx];
+  cell.cropId = crop.id; cell.state='planted';
+  cell.plantedAt = NOW(); cell.wateredAt = NOW(); cell.pest = false;
+  advanceDailyTask('dt5');
+  playSfx('plant');
+  closeModal('crop-modal');
+  renderFarm(); renderHUD(); saveG();
+  toast(`🌱 已種植 ${crop.name}！`);
+}
+function openCellAction(idx){
+  const cell = G.cells[idx];
+  const crop = CROPS.find(c=>c.id===cell.cropId);
+  const modal = document.getElementById('cell-modal');
+  const title = document.getElementById('cell-modal-title');
+  const info = document.getElementById('cell-modal-info');
+  const actions = document.getElementById('cell-modal-actions');
+  title.textContent = crop ? `${crop.emoji} ${crop.name}` : '農地';
+  let infoText = '';
+  if(cell.state==='planted') infoText='剛種下，正在發芽...';
+  else if(cell.state==='growing'){
+    const elapsed=(NOW()-cell.plantedAt)/1000/60;
+    const remain = crop ? Math.max(0, crop.growTime - elapsed) : 0;
+    infoText=`成長中，還需 ${Math.ceil(remain)} 分鐘`;
+  }
+  else if(cell.state==='ready') infoText='✅ 可以收成了！';
+  else if(cell.state==='withered') infoText='🍂 已枯萎，需要清除';
+  if(cell.pest) infoText += ' ⚠️ 有蟲害！';
+  info.innerHTML = infoText;
+  actions.innerHTML='';
+  if(cell.state==='ready') addActionBtn(actions,'🧺 收成','btn-primary',()=>harvestCell(idx));
+  if(cell.state==='withered') addActionBtn(actions,'🗑️ 清除','btn-red',()=>clearCell(idx));
+  if((cell.state==='planted'||cell.state==='growing')) addActionBtn(actions,'💧 澆水','btn-blue',()=>waterCell(idx));
+  if(cell.pest) addActionBtn(actions,'🐛 除蟲','btn-orange',()=>pestCell(idx));
+  if(cell.state!=='empty') addActionBtn(actions,'🗑️ 鏟除','btn-red btn-sm',()=>clearCell(idx));
+  addActionBtn(actions,'取消','btn-sm',()=>closeModal('cell-modal'));
+  modal.classList.add('active');
+}
+function addActionBtn(container, text, cls, fn){
+  const btn = document.createElement('button');
+  btn.className = 'btn ' + cls;
+  btn.textContent = text;
+  btn.onclick = ()=>{ fn(); closeModal('cell-modal'); };
+  container.appendChild(btn);
+}
+function harvestCell(idx){
+  const cell = G.cells[idx];
+  if(cell.state!=='ready') return;
+  const crop = CROPS.find(c=>c.id===cell.cropId);
+  if(!crop) return;
+  const mult = festivalMult('harvest');
+  const gold = Math.floor(crop.sellPrice * mult);
+  G.money += gold; addXp(crop.xp);
+  G.stats.harvested++;
+  addInventory(crop.id, 1);
+  advanceDailyTask('dt1');
+  advanceFestivalTask('harvest');
+  cell.state='empty'; cell.cropId=null; cell.plantedAt=null; cell.wateredAt=null; cell.pest=false;
+  playSfx('harvest');
+  renderFarm(); renderHUD(); saveG();
+  const bonus = mult>1 ? ` 🎊x${mult}` : '';
+  toast(`🧺 收成 ${crop.emoji}${crop.name}！+💰${gold} +✨${crop.xp}XP${bonus} 📦+1`);
+}
+function clearCell(idx){
+  const cell = G.cells[idx];
+  cell.state='empty'; cell.cropId=null; cell.plantedAt=null; cell.wateredAt=null; cell.pest=false;
+  renderFarm(); saveG();
+}
+function waterCell(idx){
+  const cell = G.cells[idx];
+  cell.wateredAt = NOW();
+  if(cell.plantedAt) cell.plantedAt -= 5*60*1000;
+  G.stats.watered++;
+  advanceDailyTask('dt2');
+  playSfx('water');
+  renderFarm(); saveG();
+  toast('💧 已澆水！');
+}
+function pestCell(idx){
+  const cell = G.cells[idx];
+  cell.pest = false;
+  if(cell.plantedAt) cell.plantedAt -= 3*60*1000;
+  G.stats.pested++;
+  advanceDailyTask('dt3');
+  playSfx('pest');
+  renderFarm(); saveG();
+  toast('🐛 除蟲完成！');
+}
+function doWaterAll(){
+  const COOLDOWN = 3*60*1000;
+  const last = G.cooldowns.waterAll || 0;
+  const remaining = COOLDOWN - (NOW()-last);
+  if(remaining > 0){
+    const m = Math.ceil(remaining/60000);
+    toast(`💧 冷卻中！還需等待 ${m} 分鐘`); return;
+  }
+  G.cooldowns.waterAll = NOW();
+  let count=0;
+  G.cells.forEach((cell,i)=>{
+    if(!cell.locked&&(cell.state==='planted'||cell.state==='growing')){
+      cell.wateredAt = NOW();
+      if(cell.plantedAt) cell.plantedAt -= 5*60*1000;
+      G.stats.watered++; count++;
+    }
+  });
+  if(count>0){ advanceDailyTask('dt2'); playSfx('water'); toast(`💧 已澆水 ${count} 格！`); }
+  else toast('💧 沒有需要澆水的作物');
+  renderFarm(); saveG();
+}
+function doPesticideAll(){
+  const COOLDOWN = 3*60*1000;
+  const last = G.cooldowns.pestAll || 0;
+  const remaining = COOLDOWN - (NOW()-last);
+  if(remaining > 0){
+    const m = Math.ceil(remaining/60000);
+    toast(`🐛 冷卻中！還需等待 ${m} 分鐘`); return;
+  }
+  G.cooldowns.pestAll = NOW();
+  let count=0;
+  G.cells.forEach((cell,i)=>{
+    if(!cell.locked&&cell.pest){
+      cell.pest=false; G.stats.pested++; count++;
+    }
+  });
+  if(count>0){ advanceDailyTask('dt3'); playSfx('pest'); toast(`🐛 除蟲 ${count} 格！`); }
+  else toast('🐛 目前沒有蟲害');
+  renderFarm(); saveG();
+}
+function doHarvestAll(){
+  G.cells.forEach((cell,i)=>{ if(!cell.locked&&cell.state==='ready') harvestCell(i); });
+}
+function tryUnlockCell(idx){
+  const price = LAND_PRICES[idx];
+  if(G.money < price){ toast(`金幣不足！需要 💰${price}`); return; }
+  if(confirm(`花費 💰${price} 解鎖這塊土地？`)){
+    G.money -= price;
+    G.cells[idx].locked = false;
+    playSfx('buy');
+    renderFarm(); renderHUD(); saveG();
+    toast('🏡 土地解鎖成功！');
+  }
+}
+
+/* ===== XP ===== */
+function addXp(amount){
+  G.xp += amount;
+  const needed = getXpNeeded(G.level);
+  while(G.xp >= needed && G.level < 20){
+    G.xp -= needed;
+    G.level++;
+    playSfx('levelup');
+    toast(`🎉 升級了！現在是 Lv.${G.level}！`);
+  }
+  renderHUD();
+}
+
+/* ===== INVENTORY ===== */
+function addInventory(id, n){
+  G.inventory[id] = (G.inventory[id]||0) + n;
+}
+function removeInventory(id, n){
+  if((G.inventory[id]||0) < n) return false;
+  G.inventory[id] -= n;
+  if(G.inventory[id] <= 0) delete G.inventory[id];
+  return true;
+}
+function hasIngredients(ing){
+  for(const id in ing) if((G.inventory[id]||0) < ing[id]) return false;
+  return true;
+}
+function consumeIngredients(ing){ for(const id in ing) removeInventory(id, ing[id]); }
+
+/* ===== SHOP ===== */
+function renderShop(){
+  const spec = document.getElementById('shop-special');
+  spec.innerHTML='';
+  SHOP_SPECIALS.forEach(item=>{
+    const div = document.createElement('div');
+    div.className='shop-item';
+    let btn;
+    if(item.id==='chef_book' && G.chefBookOwned){
+      btn = `<span style="color:var(--green);font-weight:700">✅ 已擁有</span>`;
+    } else {
+      btn = `<button class="btn btn-sm btn-orange" onclick="buySpecial('${item.id}')">購買</button>`;
+    }
+    div.innerHTML=`<div class="emoji">${item.emoji}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-desc">${item.desc}</div>
+      <div class="item-price">💰${item.price}</div>
+      ${btn}`;
+    spec.appendChild(div);
+  });
+  const seeds = document.getElementById('shop-seeds');
+  seeds.innerHTML='';
+  CROPS.forEach(crop=>{
+    const div = document.createElement('div');
+    div.className='shop-item';
+    div.innerHTML=`<div class="emoji">${crop.emoji}</div>
+      <div class="item-name">${crop.name}</div>
+      <div class="item-desc">⏱${crop.growTime}分 ✨${crop.xp}XP</div>
+      <div class="item-price">💰${crop.buyPrice}</div>
+      <button class="btn btn-sm btn-primary" onclick="goPlant()">前往種植</button>`;
+    seeds.appendChild(div);
+  });
+  const anm = document.getElementById('shop-animals');
+  anm.innerHTML='';
+  ANIMALS.forEach(a=>{
+    const owned = G.animals.some(x=>x.id===a.id);
+    const div = document.createElement('div');
+    div.className='shop-item';
+    div.innerHTML=`<div class="emoji">${a.emoji}</div>
+      <div class="item-name">${a.name}</div>
+      <div class="item-desc">${a.collect} 每小時 💰${a.incomePerHr}</div>
+      <div class="item-price">💰${a.buyPrice}</div>
+      ${owned?'<span style="color:var(--green);font-weight:700">✅ 已擁有</span>':`<button class="btn btn-sm btn-primary" onclick="buyAnimal('${a.id}')">購買</button>`}`;
+    anm.appendChild(div);
+  });
+  const land = document.getElementById('shop-land');
+  const locked = G.cells.filter(c=>c.locked);
+  land.innerHTML = locked.length===0
+    ? '<p class="text-sm">🎉 所有土地已解鎖！</p>'
+    : `<p class="text-sm">已解鎖 ${36-locked.length}/36 格。可在農場點擊鎖定格解鎖。</p>`;
+}
+function goPlant(){ openSection('farm'); toast('請點擊空格選擇作物種植'); }
+function buySpecial(id){
+  const item = SHOP_SPECIALS.find(x=>x.id===id);
+  if(!item) return;
+  if(G.money < item.price){ toast('💰 金幣不足！'); return; }
+  if(id==='chef_book' && G.chefBookOwned){ toast('已擁有大廚食譜！'); return; }
+  G.money -= item.price;
+  if(id==='dog7'){
+    G.dog = NOW() + item.days*24*3600*1000;
+    toast('🐕 看門狗已啟動！');
+  } else if(item.type==='fertilizer'){
+    let n=0;
+    G.cells.forEach(cell=>{
+      if(!cell.locked&&cell.plantedAt&&cell.state!=='ready'&&cell.state!=='empty'){
+        const c = CROPS.find(x=>x.id===cell.cropId);
+        if(c){ cell.plantedAt -= c.growTime*0.5*60*1000; n++; }
+      }
+    });
+    toast(`🧪 超級肥料！${n} 格作物加速50%成長！`);
+    renderFarm();
+  } else if(item.type==='pestall'){
+    let n=0; G.cells.forEach(c=>{ if(!c.locked&&c.pest){ c.pest=false; n++; G.stats.pested++; } });
+    toast(`🪲 全農殺蟲！${n} 格除蟲完成！`);
+    renderFarm();
+  } else if(item.type==='waterall'){
+    let n=0; G.cells.forEach(c=>{
+      if(!c.locked&&(c.state==='planted'||c.state==='growing')){
+        c.wateredAt=NOW(); if(c.plantedAt) c.plantedAt -= 5*60*1000; G.stats.watered++; n++;
+      }
+    });
+    toast(`🌧️ 人工降雨！${n} 格作物已澆水並加速成長！`);
+    renderFarm();
+  } else if(item.type==='chefbook'){
+    G.chefBookOwned = true;
+    toast('📚 大廚食譜已解鎖！全部食譜開放！');
+  }
+  playSfx('buy');
+  renderShop(); renderFarm(); renderCooking(); renderHUD(); saveG();
+}
+function buyAnimal(animalId){
+  const def = ANIMALS.find(x=>x.id===animalId);
+  if(!def) return;
+  if(G.money < def.buyPrice){ toast('💰 金幣不足！'); return; }
+  if(G.animals.some(x=>x.id===animalId)){ toast('已擁有此動物！'); return; }
+  G.money -= def.buyPrice;
+  G.animals.push({ id:def.id, lastCollect:NOW(), ownedAt:NOW() });
+  playSfx('buy');
+  renderShop(); renderAnimals(); renderHUD(); saveG();
+  toast(`${def.emoji} ${def.name} 已加入農場！`);
+}
+
+/* ===== ANIMALS ===== */
+function renderAnimals(){
+  const grid = document.getElementById('my-animals-grid');
+  grid.innerHTML='';
+  if(G.animals.length===0){
+    grid.innerHTML='<p class="text-sm">還沒有動物，前往商城購買！</p>';
+  } else {
+    G.animals.forEach(a=>{
+      const def = ANIMALS.find(x=>x.id===a.id);
+      if(!def) return;
+      const hours = (NOW()-a.lastCollect)/3600000;
+      const pending = Math.floor(def.incomePerHr * Math.min(hours, 8));
+      const div = document.createElement('div');
+      div.className='animal-card owned';
+      div.innerHTML=`<div class="animal-emoji">${def.emoji}</div>
+        <div class="animal-name">${def.name}</div>
+        <div class="animal-info">${def.collect}</div>
+        <div class="animal-status">待收：💰${pending}</div>
+        <button class="btn btn-sm btn-primary" style="margin-top:6px" onclick="collectAnimal('${a.id}')">收取</button>`;
+      grid.appendChild(div);
+    });
+  }
+  const rate = document.getElementById('animal-rate-grid');
+  rate.innerHTML = '';
+  ANIMALS.forEach(a=>{
+    const d = document.createElement('div');
+    d.className = 'animal-rate';
+    d.innerHTML = `${a.emoji} ${a.name}: 💰${a.incomePerHr}/hr`;
+    rate.appendChild(d);
+  });
+}
+function collectAnimal(animalId){
+  const a = G.animals.find(x=>x.id===animalId);
+  const def = ANIMALS.find(x=>x.id===animalId);
+  if(!a||!def) return;
+  const hours = Math.min((NOW()-a.lastCollect)/3600000, 8);
+  if(hours < 0.016){ toast('剛剛才收取過！'); return; }
+  const mult = festivalMult('animal');
+  const income = Math.floor(def.incomePerHr * hours * mult);
+  const xpGain = Math.floor(def.xpPerHr * hours);
+  G.money += income; addXp(xpGain);
+  const productAmt = Math.max(1, Math.floor(hours));
+  addInventory(def.productId, productAmt);
+  a.lastCollect = NOW();
+  advanceFestivalTask('animal');
+  playSfx('collect');
+  renderAnimals(); renderHUD(); saveG();
+  const bonus = mult>1 ? ` 🎊x${mult}` : '';
+  toast(`${def.emoji} 收取 +💰${income}${bonus} 📦+${productAmt}`);
+}
+
+/* ===== TASKS ===== */
+function renderTasks(){
+  const dl = document.getElementById('daily-tasks');
+  dl.innerHTML='';
+  if(!G.dailyTasks) G.dailyTasks = generateDailyTasks();
+  G.dailyTasks.forEach(t=>dl.appendChild(createTaskEl(t, t.done, t.progress, t.target, 'claimDailyTask', t.id, false)));
+  const al = document.getElementById('achieve-tasks');
+  al.innerHTML='';
+  getAchieveTasks().forEach(t=>{
+    const progress = getAchieveProgress(t);
+    const done = G.achievements[t.id]?.claimed;
+    al.appendChild(createTaskEl(t, done, progress, t.target, 'claimAchieve', t.id, false));
+  });
+}
+function createTaskEl(t, done, progress, target, claimFnName, claimFnArg, isFestival){
+  const div = document.createElement('div');
+  div.className = 'task-item' + (done?' done':'') + (isFestival?' festival':'');
+  const pct = Math.min(100, (progress/target)*100);
+  const claimHtml = done
+    ? '<span style="color:var(--green);font-size:0.78rem">✅已完成</span>'
+    : progress >= target
+      ? `<button class="btn btn-xs btn-primary" data-claim-fn="${claimFnName}" data-claim-arg="${claimFnArg}">領取</button>`
+      : '';
+  div.innerHTML=`<span class="task-emoji">${t.emoji}</span>
+    <div class="task-info">
+      <div class="task-name">${t.name}</div>
+      <div class="task-desc">${t.desc}</div>
+      <div class="task-progress">${progress}/${target} (${Math.floor(pct)}%)</div>
+    </div>
+    <div style="text-align:right">
+      <div class="task-reward">💰${t.rewardMoney} ✨${t.rewardXp}</div>
+      ${claimHtml}
+    </div>`;
+  const btn = div.querySelector('[data-claim-fn]');
+  if(btn){
+    btn.addEventListener('click', ()=>{
+      const fn = btn.getAttribute('data-claim-fn');
+      const arg = btn.getAttribute('data-claim-arg');
+      if(fn==='claimDailyTask') claimDailyTask(arg);
+      else if(fn==='claimAchieve') claimAchieve(arg);
+      else if(fn==='claimFestivalTask') claimFestivalTask(arg);
+    });
+  }
+  return div;
+}
+function getAchieveProgress(t){
+  if(t.key==='harvested') return G.stats.harvested;
+  if(t.key==='watered')   return G.stats.watered;
+  if(t.key==='pested')    return G.stats.pested;
+  if(t.key==='fished')    return G.stats.fished;
+  if(t.key==='cooked')    return G.stats.cooked;
+  if(t.key==='animals')   return G.animals.length;
+  if(t.key==='cells')     return G.cells.filter(c=>!c.locked).length;
+  if(t.key==='money')     return G.money;
+  return 0;
+}
+function advanceDailyTask(id){
+  if(!G.dailyTasks) return;
+  const t = G.dailyTasks.find(x=>x.id===id);
+  if(!t||t.done) return;
+  t.progress = Math.min(t.target, t.progress+1);
+  renderTasks();
+}
+function claimDailyTask(id){
+  const t = G.dailyTasks.find(x=>x.id===id);
+  if(!t||t.done||t.progress<t.target) return;
+  t.done = true;
+  G.money += t.rewardMoney; addXp(t.rewardXp);
+  playSfx('collect');
+  renderTasks(); renderHUD(); saveG();
+  toast(`🎉 任務完成！+💰${t.rewardMoney} +✨${t.rewardXp}XP`);
+}
+function claimAchieve(id){
+  const t = getAchieveTasks().find(x=>x.id===id);
+  if(!t) return;
+  if(G.achievements[id]?.claimed) return;
+  if(getAchieveProgress(t) < t.target){ toast('尚未達成！'); return; }
+  if(!G.achievements[id]) G.achievements[id]={};
+  G.achievements[id].claimed = true;
+  G.money += t.rewardMoney; addXp(t.rewardXp);
+  playSfx('levelup');
+  renderTasks(); renderHUD(); saveG();
+  toast(`🏆 成就達成！+💰${t.rewardMoney} +✨${t.rewardXp}XP`);
+}
+
+/* ===== NEIGHBORS ===== */
+function renderNeighbors(){
+  document.getElementById('friend-count').textContent = G.friends.length;
+  const friendGrid = document.getElementById('friend-grid');
+  friendGrid.innerHTML='';
+  if(G.friends.length===0){
+    friendGrid.innerHTML='<p class="text-sm">還沒有好友，從AI鄰居中添加！</p>';
+  } else {
+    G.friends.forEach(fid=>{
+      const ai = aiNeighbors[fid];
+      if(!ai) return;
+      friendGrid.appendChild(createNeighborCard(ai, true));
+    });
+  }
+  const aiGrid = document.getElementById('ai-neighbor-grid');
+  aiGrid.innerHTML='';
+  aiNeighbors.forEach(ai=>aiGrid.appendChild(createNeighborCard(ai, G.friends.includes(ai.id))));
+}
+function createNeighborCard(ai, isFriend){
+  const emojis=['🧑‍🌾','👩‍🌾','🧓','👴','👵','🧑','👦','👧','👨','👩','🐱','🐶','🐼','🦊','🐰','🌻'];
+  const activeCells = ai.cells.filter(c=>!c.locked&&c.state!=='empty').length;
+  const readyCells = ai.cells.filter(c=>!c.locked&&c.state==='ready').length;
+  const pestCells = ai.cells.filter(c=>!c.locked&&c.pest).length;
+  let statusText = '';
+  if(readyCells>0) statusText = `🧺 ${readyCells}格待收`;
+  else if(pestCells>0) statusText = `🐛 ${pestCells}格蟲害`;
+  else if(activeCells>0) statusText = `🌱 ${activeCells}格種植中`;
+  else statusText = `😴 農場休息中`;
+  const div = document.createElement('div');
+  div.className = 'neighbor-card' + (isFriend?' friend':'');
+  div.innerHTML=`<div class="neighbor-avatar">${emojis[ai.id%emojis.length]}</div>
+    <div class="neighbor-name">${ai.name}</div>
+    <div class="neighbor-level">Lv.${ai.level}</div>
+    <div class="neighbor-level" style="color:#888;font-size:0.68rem;margin-top:2px">${statusText}</div>
+    <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;justify-content:center">
+      ${isFriend?`<button class="btn btn-xs btn-red" onclick="removeFriend(${ai.id})">移除</button>`
+        :G.friends.length<30?`<button class="btn btn-xs btn-blue" onclick="addFriend(${ai.id})">+好友</button>`:''}
+      <button class="btn btn-xs btn-primary" onclick="visitNeighbor(${ai.id})">拜訪</button>
+    </div>`;
+  return div;
+}
+function addFriend(id){
+  if(G.friends.length>=30){ toast('好友已滿30位！'); return; }
+  if(G.friends.includes(id)){ toast('已是好友！'); return; }
+  G.friends.push(id);
+  advanceDailyTask('dt4');
+  playSfx('collect');
+  renderNeighbors(); saveG();
+  toast(`✅ 已添加 ${aiNeighbors[id]?.name} 為好友！`);
+}
+function removeFriend(id){
+  G.friends = G.friends.filter(x=>x!==id);
+  renderNeighbors(); saveG();
+  toast('已移除好友');
+}
+
+/* ===== VISIT ===== */
+let visitingId = null;
+function visitNeighbor(id){
+  visitingId = id;
+  const ai = aiNeighbors[id];
+  document.getElementById('visit-title').textContent = `${ai.name} 的農場 (Lv.${ai.level})`;
+  document.getElementById('visit-desc').textContent = `好友: ${G.friends.includes(id)?'✅ 是':'❌ 否'} ｜ 可幫忙澆水、除蟲${G.friends.includes(id)?'、偷菜':''}`;
+  document.getElementById('visit-msg').textContent = '';
+  renderVisitFarm(ai);
+  document.getElementById('visit-overlay').classList.add('active');
+  G.stats.visited++;
+  advanceDailyTask('dt4');
+  advanceFestivalTask('visit');
+  saveG();
+}
+function renderVisitFarm(ai){
+  const grid = document.getElementById('visit-farm-grid');
+  grid.innerHTML='';
+  ai.cells.forEach((cell,i)=>{
+    const div = document.createElement('div');
+    div.className = 'visit-cell';
+    if(cell.locked){ div.classList.add('locked'); div.textContent='🔒'; }
+    else if(cell.state==='empty'){ div.textContent='🟫'; }
+    else {
+      const crop = CROPS.find(c=>c.id===cell.cropId);
+      div.classList.add(cell.state);
+      div.textContent = crop?crop.emoji:'🌿';
+      if(cell.pest) div.textContent += '🐛';
+    }
+    grid.appendChild(div);
+  });
+}
+function visitWaterAll(){
+  const ai = aiNeighbors[visitingId];
+  let count=0;
+  ai.cells.forEach(cell=>{
+    if(!cell.locked&&(cell.state==='planted'||cell.state==='growing')){
+      cell.wateredAt=NOW();
+      if(cell.plantedAt) cell.plantedAt-=3*60*1000;
+      count++;
+    }
+  });
+  addXp(count*3); G.money += count*5;
+  playSfx('water');
+  saveAiNeighbors(); renderVisitFarm(ai); renderHUD(); saveG();
+  document.getElementById('visit-msg').textContent=`💧 幫忙澆水 ${count} 格！+💰${count*5} +✨${count*3}XP`;
+}
+function visitPestAll(){
+  const ai = aiNeighbors[visitingId];
+  let count=0;
+  ai.cells.forEach(cell=>{ if(!cell.locked&&cell.pest){ cell.pest=false; count++; } });
+  addXp(count*5); G.money += count*8;
+  playSfx('pest');
+  saveAiNeighbors(); renderVisitFarm(ai); renderHUD(); saveG();
+  document.getElementById('visit-msg').textContent=`🐛 幫忙除蟲 ${count} 格！+💰${count*8} +✨${count*5}XP`;
+}
+function visitStealAll(){
+  if(!G.friends.includes(visitingId)){
+    document.getElementById('visit-msg').textContent='❌ 只有好友才能偷菜！';
+    return;
+  }
+  const ai = aiNeighbors[visitingId];
+  let stolen=0, earned=0;
+  ai.cells.forEach(cell=>{
+    if(!cell.locked&&cell.state==='ready'&&Math.random()<0.5){
+      const crop = CROPS.find(c=>c.id===cell.cropId);
+      if(crop){
+        earned += Math.floor(crop.sellPrice*0.6);
+        addXp(Math.floor(crop.xp*0.5));
+        cell.state='empty'; cell.cropId=null; cell.plantedAt=null;
+        stolen++;
+      }
+    }
+  });
+  if(stolen===0){ document.getElementById('visit-msg').textContent='沒有可偷的菜或沒偷成功！'; return; }
+  G.money += earned;
+  playSfx('collect');
+  saveAiNeighbors(); renderVisitFarm(ai); renderHUD(); saveG();
+  document.getElementById('visit-msg').textContent=`🥕 偷了 ${stolen} 格！+💰${earned}`;
+}
+function closeVisit(){
+  document.getElementById('visit-overlay').classList.remove('active');
+  visitingId=null;
+}
+
+/* ============================================================
+   FISHING
+   ============================================================ */
+let isFishing = false;
+function renderFishing(){
+  renderFestivalBanner('festival-banner-fish');
+  const codex = document.getElementById('fish-codex');
+  codex.innerHTML = '';
+  FISHES.forEach(f=>{
+    const caught = G.fishCaught[f.id] || 0;
+    const div = document.createElement('div');
+    div.className = 'fish-card' + (caught>0?' caught':'');
+    const stars = '⭐'.repeat(f.rarityStars);
+    div.innerHTML = `<div class="emoji">${caught>0?f.emoji:'❓'}</div>
+      <div class="name">${caught>0?f.name:'未發現'}</div>
+      <div class="rarity">${f.rarity} ${stars}</div>
+      <div class="info">💰${f.sellPrice}</div>
+      <div class="count">${caught>0?`✨${f.xp}XP ・已釣 ×${caught}`:`✨${f.xp}XP`}</div>`;
+    codex.appendChild(div);
+  });
+}
+function pickFish(){
+  // weighted random, slight bonus for higher levels
+  const lvBonus = Math.min(2, G.level/10);
+  const weighted = FISHES.map(f=>({ f, w: f.rarityStars>=3 ? f.weight*(1+lvBonus*0.4) : f.weight }));
+  const total = weighted.reduce((s,x)=>s+x.w,0);
+  let r = Math.random()*total;
+  for(const x of weighted){ if((r -= x.w) <= 0) return x.f; }
+  return FISHES[0];
+}
+function doFish(){
+  if(isFishing) return;
+  if(G.money < BAIT_COST){ toast(`💰 金幣不足！需要 ${BAIT_COST} 元魚餌`); return; }
+  G.money -= BAIT_COST;
+  renderHUD();
+  isFishing = true;
+  const card = document.getElementById('fishing-card');
+  const status = document.getElementById('fishing-status');
+  const btn = document.getElementById('fishing-btn');
+  card.classList.add('fishing');
+  btn.disabled = true;
+  btn.textContent = '🎣 釣魚中...';
+  status.textContent = '🎣 撒餌等候中...';
+  playSfx('cast');
+  const waitMs = 2000 + Math.random()*3500;
+  setTimeout(()=>{
+    if(!isFishing) return;
+    card.classList.remove('fishing');
+    card.classList.add('bite');
+    status.textContent = '⚡ 上鉤了！';
+    playSfx('bite');
+    setTimeout(()=>{
+      card.classList.remove('bite');
+      const fish = pickFish();
+      const mult = festivalMult('fish');
+      const gold = Math.floor(fish.sellPrice * mult);
+      G.money += gold;
+      addXp(fish.xp);
+      G.stats.fished++;
+      G.fishCaught[fish.id] = (G.fishCaught[fish.id]||0)+1;
+      addInventory(fish.id, 1);
+      advanceDailyTask('dt6');
+      advanceFestivalTask('fish');
+      playSfx('catch');
+      // show modal
+      document.getElementById('catch-emoji').textContent = fish.emoji;
+      document.getElementById('catch-name').textContent = fish.name;
+      const stars = '⭐'.repeat(fish.rarityStars);
+      document.getElementById('catch-rarity').innerHTML = `<span style="color:#888">${fish.rarity}</span> ${stars}`;
+      const bonus = mult>1 ? ` 🎊x${mult}` : '';
+      document.getElementById('catch-reward').innerHTML = `+💰${gold} +✨${fish.xp}XP${bonus}<br>📦 食材庫存 +1`;
+      document.getElementById('catch-modal').classList.add('active');
+      status.textContent = '釣到了！繼續挑戰下一條吧';
+      btn.disabled = false;
+      btn.textContent = '🎣 繼續釣魚';
+      isFishing = false;
+      renderHUD(); renderFishing(); saveG();
+    }, 700);
+  }, waitMs);
+}
+
+/* ============================================================
+   COOKING
+   ============================================================ */
+function renderCooking(){
+  renderFestivalBanner('festival-banner-cook');
+  // unlock banner
+  const ub = document.getElementById('cooking-unlock-area');
+  const totalRecipes = RECIPES.length;
+  const visibleRecipes = G.chefBookOwned ? totalRecipes : RECIPES.filter(r=>!r.premium).length;
+  if(G.chefBookOwned){
+    ub.innerHTML = `<div class="cooking-unlock-banner unlocked">
+      <div class="icon">📚</div>
+      <div class="text"><strong>大廚食譜已解鎖！</strong>全部 ${totalRecipes} 道食譜開放使用。</div>
+    </div>`;
+  } else {
+    ub.innerHTML = `<div class="cooking-unlock-banner">
+      <div class="icon">📖</div>
+      <div class="text"><strong>解鎖更多食譜！</strong>目前顯示 ${visibleRecipes}/${totalRecipes} 道食譜。前往商城購買「大廚食譜」可解鎖全部！</div>
+    </div>`;
+  }
+  // inventory
+  const ig = document.getElementById('inv-grid');
+  ig.innerHTML = '';
+  const keys = Object.keys(G.inventory||{}).filter(k=>G.inventory[k]>0);
+  if(keys.length===0){
+    ig.innerHTML = '<div class="inv-empty">📭 庫存為空，去收成、養動物、釣魚取得食材！</div>';
+  } else {
+    const order = (id)=>{
+      if(CROPS.find(c=>c.id===id)) return 1;
+      if(ANIMALS.find(a=>a.productId===id)) return 2;
+      if(FISHES.find(f=>f.id===id)) return 3;
+      return 4;
+    };
+    keys.sort((a,b)=>order(a)-order(b));
+    keys.forEach(k=>{
+      const info = getItemInfo(k);
+      const d = document.createElement('div');
+      d.className = 'inv-item';
+      d.innerHTML = `<div class="emoji">${info.emoji}</div><div>${info.name}</div><div class="count">×${G.inventory[k]}</div>`;
+      ig.appendChild(d);
+    });
+  }
+  // recipes
+  const rg = document.getElementById('recipe-grid');
+  rg.innerHTML = '';
+  RECIPES.forEach(r=>{
+    if(r.premium && !G.chefBookOwned) return;
+    rg.appendChild(buildRecipeCard(r));
+  });
+}
+function buildRecipeCard(r){
+  const div = document.createElement('div');
+  const can = hasIngredients(r.ingredients);
+  const job = G.cookingJobs.find(j=>j.recipeId===r.id);
+  let cls = 'recipe-card';
+  if(job) cls += ' cooking';
+  else if(r.premium) cls += ' festival';
+  else if(can) cls += ' can-cook';
+  div.className = cls;
+  // ingredients line
+  const ingStr = Object.keys(r.ingredients).map(k=>{
+    const info = getItemInfo(k);
+    return `${info.emoji}${info.name}×${r.ingredients[k]}`;
+  }).join(' ');
+  // missing
+  const missing = Object.keys(r.ingredients).filter(k=>(G.inventory[k]||0) < r.ingredients[k]);
+  let missHtml = '';
+  if(missing.length>0 && !job){
+    const parts = missing.map(k=>{
+      const info = getItemInfo(k);
+      const need = r.ingredients[k] - (G.inventory[k]||0);
+      return `${info.emoji}${info.name} ×${need}`;
+    });
+    missHtml = `<div class="recipe-missing">缺：${parts.join(' ')}</div>`;
+  }
+  // button area
+  let btn;
+  if(job){
+    const remain = Math.max(0, job.finishesAt - NOW());
+    if(remain<=0){
+      btn = `<button class="btn btn-orange" onclick="claimCooked('${r.id}')">🍽️ 取出</button>`;
+    } else {
+      const total = (job.finishesAt - job.startedAt);
+      const pct = Math.max(0, Math.min(100, ((total-remain)/total)*100));
+      const sec = Math.ceil(remain/1000);
+      btn = `<div class="cooking-progress"><div class="cooking-progress-bar" style="width:${pct}%"></div></div>
+        <div class="text-sm" style="text-align:center">烹飪中 ${sec}秒</div>`;
+    }
+  } else if(can){
+    btn = `<button class="btn btn-orange" onclick="startCooking('${r.id}')">🔥 開始烹飪</button>`;
+  } else {
+    btn = `<button class="btn" style="background:#e0e0e0;color:#888" disabled>食材不足</button>`;
+  }
+  div.innerHTML = `<div class="emoji">${r.emoji}</div>
+    <div class="name">${r.name}${r.premium?' 🌟':''}</div>
+    <div class="recipe-ingredients">${ingStr}</div>
+    <div class="recipe-desc">${r.desc}</div>
+    <div class="recipe-meta">⏱${r.cookTime}s ✨${r.xp}XP</div>
+    <div class="recipe-price">賣 💰${r.sellPrice}</div>
+    ${missHtml}
+    ${btn}`;
+  return div;
+}
+function startCooking(rid){
+  const r = RECIPES.find(x=>x.id===rid);
+  if(!r) return;
+  if(!hasIngredients(r.ingredients)){ toast('食材不足！'); return; }
+  if(G.cookingJobs.some(j=>j.recipeId===rid)){ toast('已經在烹飪這道菜了！'); return; }
+  consumeIngredients(r.ingredients);
+  G.cookingJobs.push({ recipeId:rid, startedAt:NOW(), finishesAt: NOW() + r.cookTime*1000 });
+  playSfx('cook');
+  toast(`🔥 開始烹飪 ${r.emoji}${r.name}！`);
+  renderCooking(); saveG();
+}
+function claimCooked(rid){
+  const idx = G.cookingJobs.findIndex(j=>j.recipeId===rid);
+  if(idx<0) return;
+  const job = G.cookingJobs[idx];
+  if(NOW() < job.finishesAt){ toast('還沒煮好！'); return; }
+  const r = RECIPES.find(x=>x.id===rid);
+  if(!r) return;
+  const mult = festivalMult('cook');
+  const gold = Math.floor(r.sellPrice * mult);
+  G.money += gold; addXp(r.xp);
+  G.stats.cooked++;
+  G.cookingJobs.splice(idx,1);
+  advanceDailyTask('dt7');
+  advanceFestivalTask('cook');
+  playSfx('finish');
+  renderHUD(); renderCooking(); saveG();
+  const bonus = mult>1 ? ` 🎊x${mult}` : '';
+  toast(`🍽️ ${r.emoji}${r.name} 完成！+💰${gold} +✨${r.xp}XP${bonus}`);
+}
+function tickCooking(){
+  if(!G || !G.cookingJobs || G.cookingJobs.length===0) return;
+  const sect = document.getElementById('section-cooking');
+  if(sect && sect.classList.contains('active')) renderCooking();
+}
+
+/* ============================================================
+   FESTIVAL
+   ============================================================ */
+function todayStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function todayDisplay(){
+  const d = new Date();
+  return `${d.getMonth()+1}月${d.getDate()}日`;
+}
+function getCurrentFestival(){
+  const t = todayStr();
+  for(const f of FESTIVALS){
+    if(f.ranges.some(r=>t>=r[0] && t<=r[1])) return f;
+  }
+  return null;
+}
+function festivalMult(kind){
+  const f = getCurrentFestival();
+  if(!f) return 1;
+  return f.multiplier[kind] || 1;
+}
+function festivalYearKey(f){
+  return `${f.id}_${new Date().getFullYear()}`;
+}
+function applyFestivalDailyBonus(){
+  const f = getCurrentFestival();
+  if(!f) return;
+  const key = festivalYearKey(f);
+  const today = todayStr();
+  if(!G.festivalDaily[key]) G.festivalDaily[key] = {};
+  if(!G.festivalDaily[key][today]){
+    G.festivalDaily[key][today] = true;
+    G.money += f.dailyBonus;
+    saveG();
+    setTimeout(()=>{
+      toast(`🎊 ${f.name}每日獎勵 +💰${f.dailyBonus}！`);
+      playSfx('checkin');
+    }, 800);
+  }
+}
+function advanceFestivalTask(type){
+  const f = getCurrentFestival();
+  if(!f) return;
+  const key = festivalYearKey(f);
+  if(!G.festivalTasks[key]) G.festivalTasks[key] = {};
+  f.tasks.forEach(t=>{
+    if(t.type === type){
+      if(!G.festivalTasks[key][t.id]) G.festivalTasks[key][t.id] = { progress:0, claimed:false };
+      const rec = G.festivalTasks[key][t.id];
+      if(!rec.claimed && rec.progress < t.target){
+        rec.progress = Math.min(t.target, rec.progress+1);
+      }
+    }
+  });
+  renderFestival();
+}
+function claimFestivalTask(taskId){
+  const f = getCurrentFestival();
+  if(!f) return;
+  const t = f.tasks.find(x=>x.id===taskId);
+  if(!t) return;
+  const key = festivalYearKey(f);
+  const rec = G.festivalTasks[key]?.[taskId];
+  if(!rec || rec.claimed) return;
+  if(rec.progress < t.target){ toast('尚未達成！'); return; }
+  rec.claimed = true;
+  G.money += t.rewardMoney; addXp(t.rewardXp);
+  playSfx('levelup');
+  renderFestival(); renderHUD(); saveG();
+  toast(`🎊 節慶任務完成！+💰${t.rewardMoney} +✨${t.rewardXp}XP`);
+}
+function renderFestival(){
+  // status area
+  const f = getCurrentFestival();
+  const sa = document.getElementById('festival-status-area');
+  if(f){
+    sa.innerHTML = `<div class="festival-status-card active">
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="font-size:2.6rem">${f.emoji}</div>
+        <div>
+          <div style="font-size:1.15rem;font-weight:900;color:var(--red)">${f.name}進行中！</div>
+          <div class="text-sm">${f.desc}</div>
+          <div style="color:var(--orange);font-weight:700;margin-top:4px">${f.buffText}</div>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    sa.innerHTML = `<div class="festival-status-card">
+      <p>目前沒有節慶活動。期待下一個節日的到來！</p>
+      <p class="text-sm" style="margin-top:6px">目前日期：${todayDisplay()}</p>
+    </div>`;
+  }
+  // festival cards (always show all)
+  const ca = document.getElementById('festival-cards-area');
+  ca.innerHTML = '';
+  FESTIVALS.forEach(fes=>{
+    const isActive = f && f.id===fes.id;
+    const card = document.createElement('div');
+    card.className = 'festival-card' + (isActive?' active':'');
+    let inner = `<div class="festival-card-header">
+      <div class="festival-card-emoji">${fes.emoji}</div>
+      <div class="festival-card-info">
+        <div class="festival-card-name">${fes.name}${isActive?' 🎉進行中':''}</div>
+        <div class="festival-card-desc">${fes.desc}</div>
+        <div class="festival-card-buff">${fes.buffText}</div>
+      </div>
+    </div><div class="festival-tasks">`;
+    const key = festivalYearKey(fes);
+    fes.tasks.forEach(t=>{
+      const rec = G.festivalTasks[key]?.[t.id] || { progress:0, claimed:false };
+      const done = rec.claimed;
+      const canClaim = !done && rec.progress>=t.target && isActive;
+      const claimHtml = done
+        ? '<span style="color:var(--green);font-size:0.78rem;font-weight:700">✅已領取</span>'
+        : canClaim
+          ? `<button class="btn btn-xs btn-primary" onclick="claimFestivalTask('${t.id}')">領取</button>`
+          : (isActive ? '' : '<span style="color:#aaa;font-size:0.74rem">節慶開始解鎖</span>');
+      const pct = Math.min(100, (rec.progress/t.target)*100);
+      inner += `<div class="festival-task ${done?'done':''}">
+        <span class="festival-emoji-sm">${t.emoji}</span>
+        <div class="task-info">
+          <div class="task-name">${t.name}</div>
+          <div class="task-desc">${t.desc}</div>
+          <div class="task-progress">${rec.progress}/${t.target} (${Math.floor(pct)}%)</div>
+        </div>
+        <div style="text-align:right">
+          <div class="task-reward">💰${t.rewardMoney} ✨${t.rewardXp}</div>
+          ${claimHtml}
+        </div>
+      </div>`;
+    });
+    inner += '</div>';
+    card.innerHTML = inner;
+    ca.appendChild(card);
+  });
+}
+function renderFestivalBanner(elId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  const f = getCurrentFestival();
+  if(!f){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="festival-status-card active" style="margin-bottom:10px">
+    <div style="display:flex;gap:10px;align-items:center">
+      <div style="font-size:1.8rem">${f.emoji}</div>
+      <div>
+        <div style="font-weight:900;color:var(--red)">${f.name}進行中！</div>
+        <div class="text-sm" style="color:var(--orange);font-weight:700">${f.buffText}</div>
+      </div>
+    </div>
+  </div>`;
+}
+let festiveTimer = null;
+function renderFestiveOverlay(){
+  const ov = document.getElementById('festive-overlay');
+  if(!ov) return;
+  ov.innerHTML = '';
+  if(festiveTimer){ clearInterval(festiveTimer); festiveTimer=null; }
+  const f = getCurrentFestival();
+  if(!f) return;
+  function spawn(){
+    const span = document.createElement('span');
+    span.className = 'fp';
+    span.textContent = f.particle;
+    span.style.left = (Math.random()*100) + 'vw';
+    span.style.animationDuration = (6 + Math.random()*5) + 's';
+    span.style.fontSize = (1 + Math.random()*0.8) + 'rem';
+    ov.appendChild(span);
+    setTimeout(()=>span.remove(), 12000);
+  }
+  for(let i=0;i<5;i++) setTimeout(spawn, i*800);
+  festiveTimer = setInterval(spawn, 1500);
+}
+
+/* ============================================================
+   PROFILE
+   ============================================================ */
+function renderProfile(){
+  const avatar = G.avatar || '🧑‍🌾';
+  document.getElementById('profile-avatar-display').textContent = avatar;
+  document.getElementById('prof-name').textContent = G.farmName;
+  document.getElementById('prof-level').innerHTML = `⭐ Lv.${G.level} 農夫`;
+  const needed = getXpNeeded(G.level);
+  document.getElementById('prof-xp-bar').style.width = Math.min(100, (G.xp/needed)*100) + '%';
+  document.getElementById('prof-xp-text').textContent = `${G.xp} / ${needed} XP`;
+  document.getElementById('prof-money').textContent = `💰 ${G.money}`;
+  document.getElementById('prof-harvest').textContent = G.stats.harvested + ' 次';
+  document.getElementById('prof-pest').textContent = G.stats.pested + ' 次';
+  document.getElementById('prof-water').textContent = G.stats.watered + ' 次';
+  document.getElementById('prof-fish').textContent = G.stats.fished + ' 條';
+  document.getElementById('prof-cook').textContent = G.stats.cooked + ' 道';
+  document.getElementById('prof-streak').textContent = G.checkin.streak + ' 天';
+  document.getElementById('prof-friends').textContent = G.friends.length + ' 位';
+  document.getElementById('prof-cells').textContent = G.cells.filter(c=>!c.locked).length + ' 格';
+  document.getElementById('prof-animals').textContent = G.animals.length + ' 隻';
+}
+
+/* ============================================================
+   CHECK-IN
+   ============================================================ */
+const CHECKIN_REWARDS = [50,80,100,120,150,200,300];
+function renderCheckin(){
+  const grid = document.getElementById('checkin-grid');
+  grid.innerHTML='';
+  const today = new Date().toDateString();
+  const checkedToday = G.checkin.lastDate === today;
+  for(let i=0;i<7;i++){
+    const div = document.createElement('div');
+    const done = i < G.checkin.streak;
+    const isNext = (i === G.checkin.streak) && !checkedToday;
+    let cls = 'checkin-day';
+    if(done) cls += ' done';
+    else if(isNext) cls += ' today';
+    div.className = cls;
+    div.innerHTML=`<div>第${i+1}天</div><div class="gift">🎁</div><div class="reward">💰${CHECKIN_REWARDS[i]}</div>`;
+    grid.appendChild(div);
+  }
+  const btn = document.getElementById('checkin-btn');
+  btn.disabled = checkedToday;
+  btn.style.opacity = checkedToday?'0.5':'1';
+  btn.textContent = checkedToday?'✅ 今日已簽到':'✅ 今日簽到';
+  document.getElementById('checkin-msg').textContent = checkedToday?'今日已領取簽到獎勵！':'';
+  document.getElementById('ci-streak').textContent = G.checkin.streak;
+  document.getElementById('ci-total').textContent = G.checkin.total;
+}
+function doCheckin(){
+  const today = new Date().toDateString();
+  if(G.checkin.lastDate === today){ toast('今日已簽到！'); return; }
+  const yesterday = new Date(Date.now()-86400000).toDateString();
+  if(G.checkin.lastDate === yesterday){
+    G.checkin.streak = Math.min(G.checkin.streak+1, 7);
+  } else {
+    G.checkin.streak = 1;
+  }
+  G.checkin.lastDate = today;
+  G.checkin.total++;
+  const reward = CHECKIN_REWARDS[G.checkin.streak-1] || 50;
+  G.money += reward;
+  addXp(Math.floor(reward/2));
+  playSfx('checkin');
+  renderCheckin(); renderHUD(); saveG();
+  toast(`📅 簽到成功！+💰${reward} 連續${G.checkin.streak}天！`);
+}
+
+/* ============================================================
+   AUDIO (Web Audio API)
+   ============================================================ */
+let audioCtx = null;
+let musicNodes = null;
+function getAudio(){
+  if(!audioCtx){
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ return null; }
+  }
+  return audioCtx;
+}
+function playSfx(type){
+  if(!G || !G.settings || !G.settings.sfx) return;
+  const ctx = getAudio(); if(!ctx) return;
+  if(ctx.state==='suspended') ctx.resume();
+  const t = ctx.currentTime;
+  function tone(freq, dur, vol, wave){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = wave || 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol||0.18, t+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t); osc.stop(t+dur);
+  }
+  function slide(f1,f2,dur,vol){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type='sine';
+    osc.frequency.setValueAtTime(f1,t);
+    osc.frequency.exponentialRampToValueAtTime(f2, t+dur);
+    gain.gain.setValueAtTime(0,t);
+    gain.gain.linearRampToValueAtTime(vol||0.18, t+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t); osc.stop(t+dur);
+  }
+  switch(type){
+    case 'click':   tone(800, 0.06, 0.1, 'square'); break;
+    case 'harvest': slide(440, 880, 0.25, 0.18); setTimeout(()=>slide(660,990,0.2,0.16),60); break;
+    case 'collect': tone(660, 0.12, 0.16); setTimeout(()=>tone(880,0.12,0.16),100); break;
+    case 'plant':   tone(330, 0.1, 0.14, 'triangle'); break;
+    case 'water':   slide(200, 600, 0.3, 0.12); break;
+    case 'pest':    tone(150, 0.08, 0.16, 'sawtooth'); break;
+    case 'buy':     tone(523,0.1,0.15); setTimeout(()=>tone(659,0.1,0.15),80); setTimeout(()=>tone(784,0.15,0.15),160); break;
+    case 'levelup': tone(523,0.12,0.2); setTimeout(()=>tone(659,0.12,0.2),120); setTimeout(()=>tone(784,0.12,0.2),240); setTimeout(()=>tone(1047,0.25,0.2),360); break;
+    case 'checkin': tone(880,0.1,0.18); setTimeout(()=>tone(1100,0.18,0.18),100); break;
+    case 'cast':    slide(440, 110, 0.4, 0.14); break;
+    case 'bite':    tone(880,0.08,0.2,'square'); setTimeout(()=>tone(880,0.08,0.2,'square'),120); setTimeout(()=>tone(880,0.08,0.2,'square'),240); break;
+    case 'catch':   slide(330, 880, 0.3, 0.2); setTimeout(()=>slide(660,1320,0.25,0.18),100); break;
+    case 'cook':    tone(220,0.15,0.12,'triangle'); setTimeout(()=>tone(330,0.15,0.12,'triangle'),150); break;
+    case 'finish':  tone(659,0.1,0.18); setTimeout(()=>tone(784,0.1,0.18),100); setTimeout(()=>tone(1047,0.22,0.2),200); break;
+  }
+}
+function startMusic(){
+  if(!G || !G.settings || !G.settings.music) return;
+  if(musicNodes) return;
+  const ctx = getAudio(); if(!ctx) return;
+  if(ctx.state==='suspended') ctx.resume();
+  const f = getCurrentFestival();
+  const themes = {
+    none:      [261.63, 293.66, 329.63, 392.00, 440.00, 523.25],
+    spring:    [293.66, 349.23, 392.00, 440.00, 523.25, 587.33],
+    dragon:    [261.63, 311.13, 349.23, 392.00, 466.16, 523.25],
+    moon:      [220.00, 261.63, 293.66, 329.63, 392.00, 440.00],
+    christmas: [329.63, 392.00, 440.00, 493.88, 523.25, 659.25],
+  };
+  const scale = themes[f?.id || 'none'];
+  const master = ctx.createGain();
+  master.gain.value = 0.06;
+  master.connect(ctx.destination);
+  const pad = ctx.createOscillator();
+  const padGain = ctx.createGain();
+  pad.type = 'sine'; pad.frequency.value = scale[0]/2;
+  padGain.gain.value = 0.5;
+  pad.connect(padGain).connect(master);
+  pad.start();
+  const noteInterval = setInterval(()=>{
+    if(!musicNodes) return;
+    const note = scale[Math.floor(Math.random()*scale.length)];
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = note;
+    const t = ctx.currentTime;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.5, t+0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+0.7);
+    osc.connect(gain).connect(master);
+    osc.start(t); osc.stop(t+0.8);
+  }, 650);
+  musicNodes = { pad, padGain, master, noteInterval };
+}
+function stopMusic(){
+  if(!musicNodes) return;
+  try {
+    clearInterval(musicNodes.noteInterval);
+    musicNodes.pad.stop();
+  } catch(e){}
+  musicNodes = null;
+}
+function toggleSfx(){
+  if(!G || !G.settings) return;
+  G.settings.sfx = !G.settings.sfx;
+  renderAudioButtons();
+  if(G.settings.sfx){ playSfx('click'); toast('🔔 音效已開啟'); }
+  else toast('🔕 音效已關閉');
+  saveG();
+}
+function toggleMusic(){
+  if(!G || !G.settings) return;
+  G.settings.music = !G.settings.music;
+  renderAudioButtons();
+  if(G.settings.music){ startMusic(); toast('🎵 背景音樂已開啟'); }
+  else { stopMusic(); toast('🔇 背景音樂已關閉'); }
+  saveG();
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+function openSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  const tab = document.getElementById('tab-'+name);
+  if(tab) tab.classList.add('active');
+  playSfx('click');
+  if(name==='farm') renderFarm();
+  else if(name==='shop') renderShop();
+  else if(name==='tasks') renderTasks();
+  else if(name==='neighbors') renderNeighbors();
+  else if(name==='animals') renderAnimals();
+  else if(name==='fishing') renderFishing();
+  else if(name==='cooking') renderCooking();
+  else if(name==='festival') renderFestival();
+  else if(name==='profile') renderProfile();
+  else if(name==='checkin') renderCheckin();
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('active');
+}
+let toastTimer=null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2800);
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{
+    if(e.target===overlay) overlay.classList.remove('active');
+  });
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !G){
+    if(document.getElementById('login-form').style.display!=='none') doLogin();
+    else doRegister();
+  }
+});
+
+/* ============================================================
+   AVATAR SYSTEM
+   ============================================================ */
+const AVATARS = [
+  // 農夫類
+  '🧑‍🌾','👩‍🌾','👨‍🌾','🌾',
+  // 貓狗類
+  '🐱','🐶','🐯','🦁','🐻','🐼','🐨','🐰','🦊','🐺','🐗','🐴',
+  // 老人類
+  '👴','👵','🧓',
+  // 學生類
+  '👦','👧','🧒','👨‍🎓','👩‍🎓',
+  // 上班族類
+  '👨‍💼','👩‍💼','🧑‍💼','👔',
+  // 廚師
+  '👨‍🍳','👩‍🍳','🍳',
+  // 科學家
+  '👨‍🔬','👩‍🔬','🔬',
+  // 藝術家
+  '👨‍🎨','👩‍🎨','🎨',
+  // 運動員
+  '🏃','🏃‍♀️','⛹️','🤸',
+  // 動物延伸
+  '🐸','🐧','🦆','🦉','🦅','🐝','🦋','🐛','🌸','🌻','🌹',
+  // 食物主題
+  '🥕','🌽','🍎','🍓','🍉','🥑','🍅','🥦',
+  // 神話
+  '🧙','🧜','🧝','🧚','🦸','🦹',
+  // 職業
+  '👷','💂','🕵️','🧑‍🚒','👨‍⚕️','👩‍⚕️',
+  // 季節/天氣
+  '☀️','🌈','⛄','🌊','🌙','⭐','🌟','💫',
+  // 農場主題
+  '🐄','🐑','🐔','🐷','🐣','🌱','🍀','🌿',
+];
+
+function openAvatarPicker(){
+  const grid = document.getElementById('avatar-grid');
+  grid.innerHTML='';
+  AVATARS.forEach(av=>{
+    const btn = document.createElement('button');
+    btn.style.cssText='font-size:1.8rem;background:none;border:2px solid #e0e0e0;border-radius:10px;padding:6px;cursor:pointer;transition:all .15s;';
+    btn.textContent = av;
+    if(av === G.avatar) btn.style.borderColor='var(--green)';
+    btn.onclick = ()=>{
+      G.avatar = av;
+      document.getElementById('profile-avatar-display').textContent = av;
+      playSfx('click');
+      closeModal('avatar-modal');
+      renderProfile(); saveG();
+      toast(`🎨 頭像已更換為 ${av}！`);
+    };
+    btn.onmouseover=()=>{ btn.style.borderColor='var(--orange)'; btn.style.transform='scale(1.1)'; };
+    btn.onmouseout=()=>{ btn.style.borderColor=(av===G.avatar?'var(--green)':'#e0e0e0'); btn.style.transform=''; };
+    grid.appendChild(btn);
+  });
+  document.getElementById('avatar-modal').classList.add('active');
+}
+
+/* ============================================================
+   SMARTER AI NEIGHBORS
+   ============================================================ */
+function tickAiNeighborBehavior(){
+  if(!aiNeighbors.length) return;
+  const now = NOW();
+  // Each AI does random actions: water, pest, plant, auto-harvest
+  aiNeighbors.forEach(ai=>{
+    ai.cells.forEach(cell=>{
+      if(cell.locked) return;
+      // Auto pest removal
+      if(cell.pest && Math.random()<0.4) cell.pest = false;
+      // Auto watering (speed up growth)
+      if((cell.state==='planted'||cell.state==='growing') && Math.random()<0.25){
+        if(cell.plantedAt) cell.plantedAt -= 2*60*1000;
+        cell.wateredAt = now;
+      }
+      // Auto harvest ready crops and replant
+      if(cell.state==='ready' && Math.random()<0.5){
+        const c = CROPS[Math.floor(Math.random()*CROPS.length)];
+        cell.cropId=c.id; cell.state='planted'; cell.plantedAt=now; cell.wateredAt=now; cell.pest=false;
+      }
+      // Auto plant empty cells
+      if(cell.state==='empty' && Math.random()<0.2){
+        const c = CROPS[Math.floor(Math.random()*CROPS.length)];
+        cell.cropId=c.id; cell.state='planted'; cell.plantedAt=now; cell.wateredAt=now; cell.pest=false;
+      }
+      // Randomly add pests to growing crops
+      if((cell.state==='planted'||cell.state==='growing') && !cell.pest && Math.random()<0.05){
+        cell.pest = true;
+      }
+    });
+    // Level up AI slightly over time
+    if(Math.random()<0.01) ai.level = Math.min(20, ai.level+1);
+  });
+  saveAiNeighbors();
+}
+
+console.log('🌱 開心農場 v2.5 載入完成');
+</script>
+</body>
+</html>
